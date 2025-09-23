@@ -96,3 +96,31 @@
   environment: 'development',
   timestamp: '2025-09-23 10:02:38'
 }
+{
+  message: '🚀 Servidor ejecutándose en http://localhost:4000',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 16:36:34'
+}
+{
+  message: '📚 API disponible en http://localhost:4000/api/v1',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 16:36:34'
+}
+{
+  message: '🏥 Health check en http://localhost:4000/health',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 16:36:34'
+}
+{
+  message: '🌍 Entorno: development',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 16:36:34'
+}

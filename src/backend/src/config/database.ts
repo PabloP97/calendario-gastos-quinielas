@@ -13,18 +13,20 @@ export interface DatabaseConfig {
   acquireTimeout: number;
   timeout: number;
   reconnect: boolean;
+  decimalNumbers: boolean;
 }
 
 const dbConfig: DatabaseConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '3306'),
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
+  password: process.env.DB_PASSWORD || 'admin',
   database: process.env.DB_NAME || 'calendario_gastos',
   connectionLimit: 10,
   acquireTimeout: 60000,
   timeout: 60000,
   reconnect: true,
+  decimalNumbers: true
 };
 
 // Crear pool de conexiones
@@ -39,7 +41,7 @@ export const pool = mysql.createPool({
 
 // Función para ejecutar queries con manejo de errores
 export async function executeQuery<T = any>(
-  query: string, 
+  query: string,
   params: any[] | Record<string, any> = []
 ): Promise<T[]> {
   try {
@@ -55,7 +57,7 @@ export async function executeQuery<T = any>(
 
 // Función para ejecutar queries de inserción que retornan el ID
 export async function executeInsert(
-  query: string, 
+  query: string,
   params: any[] | Record<string, any> = []
 ): Promise<number> {
   try {
