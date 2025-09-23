@@ -124,3 +124,153 @@
   environment: 'development',
   timestamp: '2025-09-23 16:36:34'
 }
+{
+  message: '🛑 SIGINT recibido. Cerrando servidor gracefully...',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 17:32:25'
+}
+{
+  message: '🚀 Servidor ejecutándose en http://localhost:4000',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 17:35:56'
+}
+{
+  message: '📚 API disponible en http://localhost:4000/api/v1',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 17:35:56'
+}
+{
+  message: '🏥 Health check en http://localhost:4000/health',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 17:35:56'
+}
+{
+  message: '🌍 Entorno: development',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 17:35:56'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  userId: 1,
+  level: 'info',
+  message: 'Usuario admin@demo.com ha iniciado sesión',
+  timestamp: '2025-09-23 17:36:29'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  method: 'POST',
+  url: '/login',
+  statusCode: 200,
+  duration: '1196ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 'No autenticado',
+  timestamp: '2025-09-23 17:36:29',
+  level: 'info',
+  message: 'HTTP Request'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  method: 'GET',
+  url: '/dias-finalizados',
+  statusCode: 200,
+  duration: '1107ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  timestamp: '2025-09-23 17:36:31',
+  level: 'info',
+  message: 'HTTP Request'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  userId: 1,
+  level: 'info',
+  message: 'Usuario admin@demo.com ha cerrado sesión',
+  timestamp: '2025-09-23 17:37:05'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  method: 'POST',
+  url: '/logout',
+  statusCode: 200,
+  duration: '781ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  timestamp: '2025-09-23 17:37:05',
+  level: 'info',
+  message: 'HTTP Request'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  method: 'POST',
+  url: '/logout',
+  statusCode: 401,
+  duration: '1334ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 'No autenticado',
+  timestamp: '2025-09-23 17:37:06',
+  level: 'info',
+  message: 'HTTP Request'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  userId: 1,
+  level: 'info',
+  message: 'Usuario admin@demo.com ha iniciado sesión',
+  timestamp: '2025-09-23 17:37:11'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  method: 'POST',
+  url: '/login',
+  statusCode: 200,
+  duration: '1194ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 'No autenticado',
+  timestamp: '2025-09-23 17:37:11',
+  level: 'info',
+  message: 'HTTP Request'
+}
+{
+  service: 'calendario-backend',
+  environment: 'development',
+  method: 'GET',
+  url: '/dias-finalizados',
+  statusCode: 200,
+  duration: '796ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  timestamp: '2025-09-23 17:37:12',
+  level: 'info',
+  message: 'HTTP Request'
+}
+{
+  message: '🛑 SIGINT recibido. Cerrando servidor gracefully...',
+  level: 'info',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 17:48:46'
+}
