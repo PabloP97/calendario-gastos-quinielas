@@ -28,7 +28,7 @@ export default function App() {
 
   // TODO: SP_SELECT - Al cargar la aplicación, verificar sesión existente
   // EXEC SP_ValidateSession @session_token = ?
-  
+
   // TODO: SP_SELECT - Al cargar la aplicación autenticada, ejecutar SP para obtener todos los días finalizados
   // EXEC SP_GetDiasFinalizados @usuario_id = ?
 
@@ -38,15 +38,15 @@ export default function App() {
       try {
         // Validar sesión con el backend real
         const user = await apiService.validateSession();
-        
+
         if (user) {
           setCurrentUser(user);
           setIsAuthenticated(true);
-          
+
           // Cargar días finalizados para el usuario autenticado
           const diasFinalizadosArray = await apiService.obtenerDiasFinalizados();
           setDiasFinalizados(new Set(diasFinalizadosArray));
-          
+
           toast.success(`Sesión restaurada`, {
             description: `Bienvenido de nuevo, ${user.nombre}`,
             duration: 2000,
@@ -68,31 +68,31 @@ export default function App() {
   // Función para manejar el login
   const handleLogin = async (credentials: LoginCredentials): Promise<boolean> => {
     setIsLoggingIn(true);
-    
+
     try {
       // Realizar login con el backend real
       const { user, token } = await apiService.login(credentials);
-      
+
       setCurrentUser(user);
       setIsAuthenticated(true);
-      
+
       // Cargar días finalizados del usuario autenticado
       const diasFinalizadosArray = await apiService.obtenerDiasFinalizados();
       setDiasFinalizados(new Set(diasFinalizadosArray));
-      
+
       // Mostrar notificación de bienvenida
       toast.success(`¡Bienvenido, ${user.nombre}!`, {
         description: "Has iniciado sesión correctamente",
         duration: 3000,
       });
-      
+
       return true;
     } catch (error) {
       console.error("Error durante el login:", error);
-      
+
       let errorMessage = "Credenciales inválidas";
       let errorDescription = "Verifica tu email y contraseña";
-      
+
       if (error instanceof Error) {
         if (error.message.includes('Error de conexión')) {
           errorMessage = "Servicio no disponible";
@@ -102,7 +102,7 @@ export default function App() {
           errorDescription = error.message;
         }
       }
-      
+
       toast.error(errorMessage, {
         description: errorDescription,
         duration: 6000,
@@ -116,21 +116,21 @@ export default function App() {
   // Función para manejar el registro
   const handleRegister = async (registerData: RegisterData): Promise<boolean> => {
     setIsRegistering(true);
-    
+
     try {
       // Realizar registro con el backend real
       const { user, token } = await apiService.register(registerData);
-      
+
       setCurrentUser(user);
       setIsAuthenticated(true);
       setShowRegister(false);
-      
+
       // Mostrar notificación de registro exitoso
       toast.success(`¡Bienvenido, ${user.nombre}!`, {
         description: "Tu cuenta ha sido creada exitosamente",
         duration: 4000,
       });
-      
+
       return true;
     } catch (error) {
       console.error("Error durante el registro:", error);
@@ -147,18 +147,18 @@ export default function App() {
   // Función para manejar la recuperación de contraseña por email
   const handlePasswordRecovery = async (recoveryData: PasswordRecoveryData): Promise<boolean> => {
     setIsRecoveringPassword(true);
-    
+
     try {
       // Enviar solicitud de recuperación al backend real
       const success = await apiService.sendPasswordRecovery(recoveryData);
-      
+
       if (!success) {
         toast.error("Email no encontrado", {
           description: "No se encontró una cuenta asociada a este email",
           duration: 4000,
         });
       }
-      
+
       return success;
     } catch (error) {
       console.error("Error durante la recuperación:", error);
@@ -177,12 +177,12 @@ export default function App() {
     try {
       // Cerrar sesión en el backend
       await apiService.logout();
-      
+
       toast.info("Sesión cerrada", {
         description: "Has cerrado sesión correctamente",
         duration: 2000,
       });
-      
+
       setCurrentUser(null);
       setIsAuthenticated(false);
       setSelectedDate(undefined);
@@ -200,12 +200,12 @@ export default function App() {
     const today = new Date();
     const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
+
     // El día debe ser el día actual Y no estar finalizado
     const isToday = dateOnly.getTime() === todayOnly.getTime();
     const dateKey = dateOnly.toISOString().split('T')[0];
     const isFinalized = diasFinalizados.has(dateKey);
-    
+
     return isToday && !isFinalized;
   };
 
@@ -213,12 +213,12 @@ export default function App() {
   const handleDateSelect = async (date: Date | undefined) => {
     if (date) {
       setIsLoadingDay(true);
-      
+
       try {
         // Cargar todos los datos del día seleccionado desde el backend
         const fechaStr = date.toISOString().split('T')[0];
         const datosDia = await apiService.obtenerDatosDia(fechaStr);
-        
+
         // Los datos se cargarán automáticamente cuando el DayDetailsPanel se monte
         // con la fecha seleccionada
         setSelectedDate(date);
@@ -239,18 +239,17 @@ export default function App() {
   // Función para finalizar un día
   const handleFinalizarDia = async (): Promise<void> => {
     if (!selectedDate || !currentUser) return;
-    
     setIsLoadingDay(true);
-    
+
     try {
       // Finalizar día en el backend
       const fechaStr = selectedDate.toISOString().split('T')[0];
       const success = await apiService.finalizarDia(fechaStr);
-      
+
       if (success) {
         // Agregar el día a la lista de días finalizados
         setDiasFinalizados((prev: Set<string>) => new Set([...prev, fechaStr]));
-        
+
         toast.success("Día finalizado", {
           description: "El día ha sido finalizado correctamente",
           duration: 3000,
@@ -291,7 +290,7 @@ export default function App() {
   if (!isAuthenticated) {
     if (showPasswordRecovery) {
       return (
-        <PasswordRecoveryForm 
+        <PasswordRecoveryForm
           onRecovery={handlePasswordRecovery}
           onBackToLogin={() => setShowPasswordRecovery(false)}
           isLoading={isRecoveringPassword}
@@ -299,7 +298,7 @@ export default function App() {
       );
     } else if (showRegister) {
       return (
-        <RegisterForm 
+        <RegisterForm
           onRegister={handleRegister}
           onBackToLogin={() => setShowRegister(false)}
           isLoading={isRegistering}
@@ -307,7 +306,7 @@ export default function App() {
       );
     } else {
       return (
-        <LoginForm 
+        <LoginForm
           onLogin={handleLogin}
           onShowRegister={() => setShowRegister(true)}
           onShowPasswordRecovery={() => setShowPasswordRecovery(true)}
@@ -327,7 +326,7 @@ export default function App() {
             <p className="font-medium text-sm">Bienvenido, {currentUser?.nombre}</p>
             <p className="text-xs text-muted-foreground">{currentUser?.email}</p>
           </div>
-          
+
           <button
             onClick={handleLogout}
             className="px-3 py-2 text-xs bg-muted hover:bg-muted/80 rounded-md transition-colors flex items-center gap-2"
@@ -346,40 +345,40 @@ export default function App() {
             Selecciona un día del calendario para gestionar tus gastos diarios y quinielas
           </p>
         </div>
-        
+
         <div className="flex justify-center relative min-h-[600px]">
           {!selectedDate && !isLoadingDay ? (
-            <CalendarView 
-              selectedDate={selectedDate} 
+            <CalendarView
+              selectedDate={selectedDate}
               onDateSelect={handleDateSelect}
               diasFinalizados={diasFinalizados}
             />
           ) : selectedDate && !isLoadingDay ? (
             <div className="w-full max-w-4xl">
-              <DayDetailsPanel 
-                selectedDate={selectedDate} 
+              <DayDetailsPanel
+                selectedDate={selectedDate}
                 isEditable={isDayEditable(selectedDate)}
                 onVolver={() => handleDateSelect(undefined)}
                 onFinalizarDia={handleFinalizarDia}
               />
             </div>
           ) : null}
-          
+
           {/* Loading Overlay para selección de día */}
           {isLoadingDay && (
             <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[60]">
               <div className="flex flex-col items-center gap-3 p-6 bg-card rounded-lg shadow-xl border-2">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 <p className="text-sm text-muted-foreground">
-                  {selectedDate && diasFinalizados.has(selectedDate.toISOString().split('T')[0]) 
-                    ? "Finalizando día..." 
+                  {selectedDate && diasFinalizados.has(selectedDate.toISOString().split('T')[0])
+                    ? "Finalizando día..."
                     : "Cargando información del día..."}
                 </p>
               </div>
             </div>
           )}
         </div>
-        
+
         {!selectedDate && !isLoadingDay && (
           <div className="text-center mt-8 p-8 border-2 border-dashed border-muted rounded-lg">
             <p className="text-muted-foreground">

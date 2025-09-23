@@ -32,7 +32,7 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = apiUrl(endpoint);
-    
+
     // Headers por defecto
     const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -59,23 +59,23 @@ class ApiService {
     try {
       // Realizar petición
       const response = await fetch(url, requestConfig);
-      
+
       // Verificar si la respuesta es exitosa
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        
+
         try {
           const errorData = await response.json();
           errorMessage = errorData.message || errorData.error || errorMessage;
         } catch {
           // Si no se puede parsear como JSON, usar el mensaje por defecto
         }
-        
+
         // Si es 401, limpiar autenticación
         if (response.status === 401) {
           this.clearSession();
         }
-        
+
         throw new Error(errorMessage);
       }
 
@@ -87,7 +87,7 @@ class ApiService {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new Error(`Error de conexión al servidor en ${url}. Verifica tu conexión a internet.`);
       }
-      
+
       throw error;
     }
   }
@@ -448,11 +448,11 @@ class ApiService {
    * Finalizar día (conecta a POST /api/v1/saldos/finalizar-dia/:fecha)
    */
   async finalizarDia(fecha: string): Promise<boolean> {
+
     try {
       const response: ApiResponse<any> = await this.makeRequest(`saldos/finalizar-dia/${fecha}`, {
         method: 'POST',
       });
-
       if (!response.success) {
         throw new Error(response.message || 'Error finalizando día');
       }
@@ -527,7 +527,7 @@ export default apiService;
 
 /**
  * ApiService - Servicio para comunicación con el backend
- * 
+ *
  * Maneja toda la comunicación HTTP con el servidor backend:
  * - Autenticación JWT con Bearer tokens
  * - Manejo de errores HTTP y de red

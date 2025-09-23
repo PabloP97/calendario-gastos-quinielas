@@ -5,12 +5,12 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Alert, AlertDescription } from "./ui/alert";
-import { 
-  Eye, 
-  EyeOff, 
-  Loader2, 
-  Lock, 
-  User, 
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  User,
   AlertCircle,
   Calendar,
   DollarSign
@@ -36,7 +36,7 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
     password: "",
     rememberMe: false
   });
-  
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
@@ -46,17 +46,17 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
     if (!email.trim()) {
       return "El email es requerido";
     }
-    
+
     // Validación más estricta de email
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(email)) {
       return "Ingresa un email válido (ejemplo: usuario@dominio.com)";
     }
-    
+
     if (email.length > 100) {
       return "El email no puede tener más de 100 caracteres";
     }
-    
+
     return undefined;
   };
 
@@ -65,28 +65,28 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
     if (!password) {
       return "La contraseña es requerida";
     }
-    
+
     if (password.length < 3) {
       return "La contraseña debe tener al menos 3 caracteres";
     }
-    
+
     if (password.length > 255) {
       return "La contraseña no puede tener más de 255 caracteres";
     }
-    
+
     return undefined;
   };
 
   // Validar formulario completo
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};
-    
+
     const emailError = validateEmail(credentials.email);
     if (emailError) newErrors.email = emailError;
-    
+
     const passwordError = validatePassword(credentials.password);
     if (passwordError) newErrors.password = passwordError;
-    
+
     return newErrors;
   };
 
@@ -110,15 +110,15 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
   // Manejar blur para validación en tiempo real
   const handleBlur = (field: 'email' | 'password') => {
     if (!hasAttemptedSubmit) return;
-    
+
     let fieldError: string | undefined;
-    
+
     if (field === 'email') {
       fieldError = validateEmail(credentials.email);
     } else if (field === 'password') {
       fieldError = validatePassword(credentials.password);
     }
-    
+
     setErrors(prev => ({
       ...prev,
       [field]: fieldError
@@ -129,10 +129,10 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setHasAttemptedSubmit(true);
-    
+
     const formErrors = validateForm();
     setErrors(formErrors);
-    
+
     if (Object.keys(formErrors).length > 0) {
       return;
     }
@@ -141,9 +141,9 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
       // TODO: SP_SELECT - Validar credenciales de usuario
       // EXEC SP_ValidateUserCredentials @email = ?, @password_hash = ?
       // EXEC SP_GetUserByEmail @email = ?
-      
+
       const loginSuccess = await onLogin(credentials);
-      
+
       if (!loginSuccess) {
         setErrors({
           general: "Email o contraseña incorrectos. Por favor, verifica tus credenciales."
@@ -170,7 +170,7 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
               <DollarSign className="h-8 w-8 text-chart-1" />
             </div>
           </div>
-          
+
           <div>
             <h1 className="text-3xl font-bold text-foreground">
               Gestión de Gastos
@@ -179,7 +179,7 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
               y Quinielas
             </h2>
           </div>
-          
+
           <p className="text-muted-foreground">
             Inicia sesión para acceder a tu calendario financiero
           </p>
@@ -193,7 +193,7 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
               Iniciar Sesión
             </CardTitle>
           </CardHeader>
-          
+
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {/* Error general */}
@@ -270,8 +270,8 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
                   onCheckedChange={(checked) => handleInputChange("rememberMe", checked as boolean)}
                   disabled={isLoading}
                 />
-                <Label 
-                  htmlFor="remember" 
+                <Label
+                  htmlFor="remember"
                   className="text-sm font-normal cursor-pointer"
                 >
                   Recordar mi sesión
@@ -305,21 +305,6 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
                 >
                   ¿Olvidaste tu contraseña?
                 </button>
-                
-                <div className="text-sm text-muted-foreground">
-                  ¿No tienes cuenta? {" "}
-                  <button
-                    type="button"
-                    onClick={onShowRegister}
-                    className="register-button inline-flex items-center gap-1 text-primary px-3 py-2 rounded-md font-medium cursor-pointer"
-                    disabled={isLoading}
-                    title="Crear una nueva cuenta de quiniela"
-                  >
-                    <User className="h-3 w-3" />
-                    Registrarse
-                    <span className="register-arrow text-xs ml-1">→</span>
-                  </button>
-                </div>
               </div>
             </CardFooter>
           </form>
