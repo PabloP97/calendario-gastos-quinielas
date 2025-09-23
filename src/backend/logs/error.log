@@ -1,0 +1,7 @@
+{
+  message: 'No se pudo conectar a la base de datos. Servidor no iniciado.',
+  level: 'error',
+  service: 'calendario-backend',
+  environment: 'development',
+  timestamp: '2025-09-23 09:59:46'
+}

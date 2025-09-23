@@ -1,0 +1,948 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --background: #ffffff;
+  --foreground: oklch(0.145 0 0);
+  --card: #ffffff;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #030213;
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.0058 264.53);
+  --secondary-foreground: #030213;
+  --muted: #ececf0;
+  --muted-foreground: #717182;
+  --accent: #e9ebef;
+  --accent-foreground: #030213;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #030213;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Estilos personalizados para los modos de día */
+.day-panel-readonly {
+  position: relative;
+  opacity: 0.85;
+  background: linear-gradient(135deg, var(--muted) 0%, var(--background) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.day-panel-readonly::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--muted-foreground), var(--muted));
+  z-index: 1;
+}
+
+.day-panel-editable {
+  position: relative;
+  background: linear-gradient(135deg, var(--background) 0%, var(--primary)/5 100%);
+  border: 2px solid var(--primary)/20;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.day-panel-editable::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--chart-1));
+  z-index: 1;
+}
+
+.readonly-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--border);
+}
+
+.current-day-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--primary)/10;
+  color: var(--primary);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--primary)/20;
+}
+
+.dark .day-panel-readonly {
+  background: linear-gradient(135deg, var(--muted) 0%, var(--background) 100%);
+  border: 1px solid var(--border);
+}
+
+.dark .day-panel-editable {
+  background: linear-gradient(135deg, var(--background) 0%, var(--primary)/10 100%);
+  border: 2px solid var(--primary)/30;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para pestañas en modo lectura */
+.day-panel-readonly .tabs-content {
+  opacity: 0.9;
+}
+
+.day-panel-readonly [data-state="inactive"] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.day-panel-editable .tabs-trigger:hover {
+  background: var(--primary)/10;
+  transition: background 0.2s ease;
+}
+
+/* Efectos de brillo para el día actual */
+@keyframes gentle-pulse {
+  0%, 100% { 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+  }
+  50% { 
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--primary)/10; 
+  }
+}
+
+.day-panel-editable {
+  animation: gentle-pulse 3s ease-in-out infinite;
+}
+
+/* Estilos para pestañas intuitivas - Día Actual (Editable) */
+.day-panel-editable [data-state="active"][data-value] {
+  background: linear-gradient(135deg, var(--chart-1) 0%, var(--chart-2) 100%);
+  color: white;
+  border: 2px solid var(--chart-1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.day-panel-editable [data-state="inactive"][data-value] {
+  background: linear-gradient(135deg, var(--primary)/15 0%, var(--chart-1)/10 100%);
+  color: var(--primary);
+  border: 1px solid var(--primary)/20;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.day-panel-editable [data-state="inactive"][data-value]:hover {
+  background: linear-gradient(135deg, var(--primary)/25 0%, var(--chart-1)/20 100%);
+  color: var(--primary);
+  border: 1px solid var(--primary)/30;
+  transform: translateY(-0.5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para pestañas intuitivas - Días Pasados (Solo Lectura) */
+.day-panel-readonly [data-state="active"][data-value] {
+  background: linear-gradient(135deg, var(--muted) 0%, var(--muted-foreground)/20 100%);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.day-panel-readonly [data-state="inactive"][data-value] {
+  background: var(--background);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.day-panel-readonly [data-state="inactive"][data-value]:hover {
+  background: var(--muted)/50;
+  opacity: 0.8;
+}
+
+/* Efectos especiales para pestañas del día actual */
+.day-panel-editable [data-state="active"][data-value]::before {
+  content: '✨';
+  margin-right: 0.25rem;
+  animation: sparkle 2s ease-in-out infinite alternate;
+}
+
+@keyframes sparkle {
+  0% { opacity: 0.6; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Indicador visual para pestañas deshabilitadas */
+.day-panel-readonly [data-state="inactive"][data-value][data-disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--muted)/30;
+}
+
+.day-panel-readonly [data-state="inactive"][data-value][data-disabled]::after {
+  content: '🔒';
+  margin-left: 0.25rem;
+  opacity: 0.6;
+}
+
+/* Transiciones suaves para todos los estados */
+.day-panel-editable [data-value],
+.day-panel-readonly [data-value] {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de brillo en pestañas activas del día actual */
+.day-panel-editable [data-state="active"][data-value]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* Dark mode adjustments */
+.dark .day-panel-editable [data-state="active"][data-value] {
+  background: linear-gradient(135deg, var(--chart-1) 0%, var(--chart-2) 100%);
+  color: var(--primary-foreground);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark .day-panel-editable [data-state="inactive"][data-value] {
+  background: linear-gradient(135deg, var(--primary)/20 0%, var(--chart-1)/15 100%);
+  color: var(--primary);
+}
+
+.dark .day-panel-readonly [data-state="active"][data-value] {
+  background: linear-gradient(135deg, var(--muted) 0%, var(--muted-foreground)/30 100%);
+  color: var(--muted-foreground);
+}
+
+/* Estilos mejorados para botón de registro intuitivo */
+.register-button {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--primary)/8 0%, var(--chart-1)/8 100%);
+  border: 1px solid var(--primary)/15;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.register-button:hover {
+  background: linear-gradient(135deg, var(--primary)/12 0%, var(--chart-1)/12 100%);
+  border: 1px solid var(--primary)/25;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--primary)/10;
+  transform: translateY(-1px);
+}
+
+.register-button:hover .register-arrow {
+  transform: translateX(2px);
+  opacity: 1;
+}
+
+.register-arrow {
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.register-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.register-button:hover::before {
+  left: 100%;
+}
+
+.register-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode para botón de registro */
+.dark .register-button {
+  background: linear-gradient(135deg, var(--primary)/15 0%, var(--chart-1)/15 100%);
+  border: 1px solid var(--primary)/20;
+}
+
+.dark .register-button:hover {
+  background: linear-gradient(135deg, var(--primary)/25 0%, var(--chart-1)/25 100%);
+  border: 1px solid var(--primary)/35;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--primary)/20;
+}
+
+/* Pulsación sutil para llamar la atención */
+@keyframes subtle-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 var(--primary)/20;
+  }
+  50% { 
+    box-shadow: 0 0 0 4px var(--primary)/10;
+  }
+}
+
+.register-button {
+  animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+.register-button:hover {
+  animation: none;
+}
+
+/* FIXES ADICIONALES PARA PREVENIR LAYOUT VERTICAL */
+.rdp * {
+  box-sizing: border-box !important;
+}
+
+/* Forzar estructura de tabla para el calendario */
+.rdp-months {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+  padding: 1rem !important;
+  width: 100% !important;
+}
+
+.rdp-month {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.75rem !important;
+  padding: 1rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Asegurar que las celdas no se colapsen */
+.rdp-head_cell,
+.rdp-cell {
+  min-width: 2.5rem !important;
+  max-width: none !important;
+  flex: 1 !important;
+}
+
+/* Prevenir que react-day-picker use flexbox o grid internamente */
+.rdp-table,
+.rdp-thead,
+.rdp-tbody,
+.rdp-head_row,
+.rdp-row {
+  display: table !important;
+}
+
+.rdp-table {
+  display: table !important;
+}
+
+.rdp-thead {
+  display: table-header-group !important;
+}
+
+.rdp-tbody {
+  display: table-row-group !important;
+}
+
+.rdp-head_row,
+.rdp-row {
+  display: table-row !important;
+}
+
+.rdp-head_cell,
+.rdp-cell {
+  display: table-cell !important;
+}
+
+/* ============================================ */
+/* ESTILOS PARA CALENDARIO (REACT-DAY-PICKER) */
+/* ============================================ */
+
+/* FORZAR GRID LAYOUT - SOLUCIONADO! */
+.calendar-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Contenedor principal del calendario */
+.rdp {
+  --rdp-cell-size: 3rem;
+  --rdp-accent-color: var(--primary);
+  --rdp-background-color: var(--background);
+  --rdp-accent-color-dark: var(--primary);
+  --rdp-background-color-dark: var(--background);
+  --rdp-outline: 2px solid var(--accent-color);
+  --rdp-outline-selected: 2px solid var(--primary);
+  margin: 0 !important;
+  font-family: inherit;
+  width: 100% !important;
+  max-width: 28rem !important;
+  display: block !important;
+}
+
+/* Tabla del calendario - FORZAR GRID */
+.rdp-table {
+  width: 100% !important;
+  max-width: none !important;
+  border-collapse: separate !important;
+  border-spacing: 0.125rem !important;
+  margin: 0 auto !important;
+  display: table !important;
+  table-layout: fixed !important;
+}
+
+/* Encabezado con días de la semana */
+.rdp-head_row {
+  display: table-row !important;
+  width: 100% !important;
+}
+
+.rdp-head_cell {
+  display: table-cell !important;
+  width: calc(100% / 7) !important;
+  min-width: var(--rdp-cell-size) !important;
+  height: 2rem !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: var(--muted-foreground) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.5rem 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* Filas de fechas */
+.rdp-tbody {
+  width: 100% !important;
+  display: table-row-group !important;
+}
+
+.rdp-row {
+  display: table-row !important;
+  width: 100% !important;
+}
+
+/* Celdas individuales - FORZAR GRID LAYOUT */
+.rdp-cell {
+  display: table-cell !important;
+  width: calc(100% / 7) !important;
+  min-width: var(--rdp-cell-size) !important;
+  height: var(--rdp-cell-size) !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  position: relative !important;
+  padding: 0.125rem !important;
+}
+
+/* Botones de días */
+.rdp-button {
+  width: 100%;
+  height: calc(var(--rdp-cell-size) - 0.25rem);
+  min-height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0;
+  padding: 0;
+  position: relative;
+  text-decoration: none;
+}
+
+.rdp-button:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--border);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Día actual */
+.rdp-day_today .rdp-button {
+  background: linear-gradient(135deg, var(--chart-1) 0%, var(--chart-2) 100%);
+  color: white;
+  font-weight: 600;
+  border: 2px solid var(--chart-1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.rdp-day_today .rdp-button::after {
+  content: '●';
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rdp-day_today .rdp-button:hover {
+  background: linear-gradient(135deg, var(--chart-1) 0%, var(--chart-2) 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Día seleccionado */
+.rdp-day_selected .rdp-button {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+  border: 2px solid var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.rdp-day_selected .rdp-button:hover {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Días deshabilitados */
+.rdp-day_disabled .rdp-button {
+  color: var(--muted-foreground);
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: var(--muted)/50;
+  position: relative;
+}
+
+.rdp-day_disabled .rdp-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: var(--muted-foreground);
+  opacity: 0.6;
+  transform: translateY(-50%);
+}
+
+/* Días fuera del mes actual */
+.rdp-day_outside .rdp-button {
+  color: var(--muted-foreground);
+  opacity: 0.3;
+  font-size: 0.75rem;
+}
+
+/* Navegación del mes */
+.rdp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.rdp-nav_button {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: var(--background);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--foreground);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.rdp-nav_button:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--primary)/30;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.rdp-nav_button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: var(--muted);
+}
+
+/* Título del mes */
+.rdp-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3rem;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.rdp-caption_label {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-align: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--chart-1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  background-image: none;
+  color: var(--foreground);
+  -webkit-text-fill-color: var(--foreground);
+}
+
+.rdp-nav_button_previous {
+  position: absolute;
+  left: 0;
+}
+
+.rdp-nav_button_next {
+  position: absolute;
+  right: 0;
+}
+
+/* Modo oscuro */
+.dark .rdp-button {
+  color: var(--foreground);
+}
+
+.dark .rdp-day_today .rdp-button {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.dark .rdp-day_selected .rdp-button {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.dark .rdp-day_disabled .rdp-button {
+  color: var(--muted-foreground);
+}
+
+.dark .rdp-day_outside .rdp-button {
+  color: var(--muted-foreground);
+}
+
+/* Ajustes responsivos */
+@media (max-width: 640px) {
+  .rdp {
+    --rdp-cell-size: 2.5rem;
+    max-width: 20rem;
+  }
+  
+  .rdp-caption_label {
+    font-size: 1rem;
+  }
+  
+  .rdp-head_cell {
+    font-size: 0.7rem;
+  }
+  
+  .rdp-button {
+    font-size: 0.8rem;
+    min-height: 2rem;
+  }
+  
+  .rdp-nav_button {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+/* Estilos adicionales para hacer el calendario más visible */
+.rdp-months {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.rdp-month {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Efectos hover mejorados */
+.rdp-button:not(.rdp-day_selected):not(.rdp-day_disabled):not(.rdp-day_today):hover {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--primary)/10 100%);
+  border-color: var(--primary)/30;
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para días finalizados */
+.rdp-day_finalized .rdp-button {
+  background: linear-gradient(135deg, var(--chart-4) 0%, var(--chart-5) 100%);
+  color: white;
+  position: relative;
+  font-weight: 600;
+  border: 2px solid var(--chart-4);
+}
+
+.rdp-day_finalized .rdp-button::after {
+  content: '✓';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.rdp-day_finalized .rdp-button:hover {
+  background: linear-gradient(135deg, var(--chart-4) 0%, var(--chart-5) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Animación sutil para días importantes */
+@keyframes calendar-glow {
+  0%, 100% { 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+  }
+  50% { 
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 2px var(--chart-1)/20; 
+  }
+}
+
+.rdp-day_today .rdp-button {
+  animation: calendar-glow 3s ease-in-out infinite;
+}
+
+/* Mejoras para modo oscuro */
+.dark .rdp-month {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark .rdp-button:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark .rdp-nav_button:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
