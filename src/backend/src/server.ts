@@ -36,7 +36,7 @@ const limiter = rateLimit({
 
 // Configuración de CORS
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: 'https://calendario-gastos-quinielas.vercel.app/',
   credentials: process.env.CORS_CREDENTIALS === 'true',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -119,7 +119,7 @@ async function startServer() {
       logger.info(`📚 API disponible en http://localhost:${PORT}/api/${API_VERSION}`);
       logger.info(`🏥 Health check en http://localhost:${PORT}/health`);
       logger.info(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
-      
+
       if (process.env.ENABLE_SWAGGER === 'true') {
         logger.info(`📖 Documentación Swagger en http://localhost:${PORT}/api/${API_VERSION}/docs`);
       }
