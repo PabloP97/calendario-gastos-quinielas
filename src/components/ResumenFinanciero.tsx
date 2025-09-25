@@ -14,6 +14,8 @@ import {
   Minus,
   Plus
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import apiService from "@/services/apiService";
 
 interface Gasto {
   id: number;
@@ -44,6 +46,18 @@ interface ResumenFinancieroProps {
 
 export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior, isEditable, onFinalizarDia }: ResumenFinancieroProps) {
   const { isOpen, currentAction, showConfirmation, hideConfirmation } = useConfirmation();
+  const [isFinalizado, setIsFinalizado] = useState(false)
+  useEffect(() => {
+    fetchDiasFinalizados()
+  }, [isFinalizado])
+  const fetchDiasFinalizados = async () => {
+    const fechaHoy = new Date().getDate()
+    const data = await apiService.obtenerDiasFinalizados()
+    const ultimoDiaFinalizado = new Date(data[0]).getDate() + 1
+    if (fechaHoy === ultimoDiaFinalizado) {
+      setIsFinalizado(true)
+    }
+  }
 
   // Función para convertir a número seguro
   const toNumber = (value: any): number => {
@@ -383,26 +397,30 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                 <p className="text-sm text-muted-foreground mb-3">
                   ⚠️ Una vez finalizado, no podrás realizar más cambios en este día
                 </p>
-                <button
-                  onClick={() => showConfirmation({
-                    title: "¿Finalizar este día?",
-                    description: "Una vez finalizado, no podrás realizar más cambios en este día. Esta acción no se puede deshacer.",
-                    onConfirm: () => {
-                      onFinalizarDia?.();
-                      hideConfirmation();
-                    },
-                    onCancel: hideConfirmation,
-                    confirmText: "Sí, Finalizar Día",
-                    cancelText: "Cancelar",
-                    variant: "destructive"
-                  })}
-                  className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  Finalizar Día
-                </button>
+                {
+                  !isFinalizado && (
+                    <button
+                      onClick={() => showConfirmation({
+                        title: "¿Finalizar este día?",
+                        description: "Una vez finalizado, no podrás realizar más cambios en este día. Esta acción no se puede deshacer.",
+                        onConfirm: () => {
+                          onFinalizarDia?.();
+                          hideConfirmation();
+                        },
+                        onCancel: hideConfirmation,
+                        confirmText: "Sí, Finalizar Día",
+                        cancelText: "Cancelar",
+                        variant: "destructive"
+                      })}
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Finalizar Día
+                    </button>
+                  )
+                }
               </div>
             )}
           </div>
