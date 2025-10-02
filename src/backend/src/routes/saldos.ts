@@ -157,8 +157,8 @@ router.post('/finalizar-dia/:fecha', asyncHandler(async (req, res) => {
   const totalEgresosQuiniela = parseFloat(egresosResult[0]?.total_egresos || 0);
 
   // 🔧 CORREGIDO: Formatear todos los valores como decimales de 2 posiciones
-  const totalEgresos = parseFloat(totalGastos) + totalEgresosQuiniela;
-  const saldoFinal = parseFloat(saldoAnterior) + totalIngresos - totalEgresos;
+  const totalEgresos = totalGastos + totalEgresosQuiniela;
+  const saldoFinal = saldoAnterior + totalIngresos - totalEgresos;
 
   // 🔧 CORREGIDO: Validar que no haya NaN y formatear a 2 decimales
   const saldoAnteriorFormateado = isNaN(saldoAnterior) ? 0 : parseFloat(saldoAnterior.toFixed(2));
