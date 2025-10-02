@@ -11,10 +11,10 @@ export const loginSchema = Joi.object({
     'string.min': 'La contraseña debe tener al menos 6 caracteres',
     'any.required': 'La contraseña es requerida'
   }),
-
+  rememberMe: Joi.boolean().optional().default(false)
 });
 
-// 🗑️ ELIMINADO: registerSchema - Ya no se permite registro público
+// ELIMINADO: registerSchema - Ya no se permite registro público
 // Los usuarios solo pueden ser creados por administradores desde el panel admin
 
 export const passwordRecoverySchema = Joi.object({

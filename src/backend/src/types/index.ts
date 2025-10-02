@@ -12,6 +12,7 @@ export interface User {
 export interface LoginCredentials {
   username: string; // Cambiado de email a username (puede ser email o número de quiniela)
   password: string;
+  rememberMe?: boolean;
 }
 
 export interface RegisterData {
