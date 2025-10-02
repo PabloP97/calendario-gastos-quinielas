@@ -25,7 +25,7 @@ router.get('/:fecha', asyncHandler(async (req, res) => {
   const query = `
     SELECT id, monto, categoria, subcategoria, descripcion, fecha
     FROM gastos 
-    WHERE usuario_id = ? AND fecha = ?
+    WHERE usuario_id = ? AND fecha = ? AND activo = TRUE
     ORDER BY id DESC
   `;
   
@@ -113,7 +113,7 @@ router.put('/:id', asyncHandler(async (req, res) => {
   // Verificar que el gasto existe y pertenece al usuario
   const existsQuery = `
     SELECT id, fecha FROM gastos 
-    WHERE id = ? AND usuario_id = ?
+    WHERE id = ? AND usuario_id = ? AND activo = TRUE
   `;
   
   const gastosExistentes = await executeQuery(existsQuery, [id, userId]);
@@ -199,7 +199,7 @@ router.delete('/:id', asyncHandler(async (req, res) => {
   // Verificar que el gasto existe y pertenece al usuario
   const existsQuery = `
     SELECT id, fecha FROM gastos 
-    WHERE id = ? AND usuario_id = ?
+    WHERE id = ? AND usuario_id = ? AND activo = TRUE
   `;
   
   const gastosExistentes = await executeQuery(existsQuery, [id, userId]);
@@ -222,8 +222,8 @@ router.delete('/:id', asyncHandler(async (req, res) => {
     throw createError('No se puede eliminar gastos de un día finalizado', 400);
   }
   
-  // Eliminar el gasto
-  const deleteQuery = 'DELETE FROM gastos WHERE id = ? AND usuario_id = ?';
+  // Eliminar el gasto (soft delete)
+  const deleteQuery = 'UPDATE gastos SET activo = FALSE WHERE id = ? AND usuario_id = ?';
   await executeQuery(deleteQuery, [id, userId]);
   
   logger.info(`Gasto eliminado`, { 

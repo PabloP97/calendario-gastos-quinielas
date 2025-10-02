@@ -43,11 +43,25 @@ export function CierreDiaModal({ isOpen, onClose, onConfirmar, fecha, juegoNombr
   const [errors, setErrors] = useState<Partial<CierreDiaData>>({});
 
   const handleInputChange = (field: keyof CierreDiaData, value: string) => {
-    const numericValue = parseFloat(value) || 0;
-    setDatos(prev => ({
-      ...prev,
-      [field]: numericValue
-    }));
+    // Manejar valor vacío
+    if (value === '' || value === '-') {
+      setDatos(prev => ({
+        ...prev,
+        [field]: 0
+      }));
+      return;
+    }
+    
+    // Convertir a número, permitiendo negativos
+    const numericValue = parseFloat(value);
+    
+    // Solo actualizar si es un número válido
+    if (!isNaN(numericValue)) {
+      setDatos(prev => ({
+        ...prev,
+        [field]: numericValue
+      }));
+    }
     
     // Limpiar error del campo al editarlo
     if (errors[field]) {
@@ -259,7 +273,7 @@ export function CierreDiaModal({ isOpen, onClose, onConfirmar, fecha, juegoNombr
                     id="recaudacion"
                     type="number"
                     step="0.01"
-                    value={datos.recaudacion || ''}
+                    value={datos.recaudacion}
                     onChange={(e) => handleInputChange('recaudacion', e.target.value)}
                     placeholder="Ingrese la recaudación (puede ser negativa)"
                     className={errors.recaudacion !== undefined ? "border-red-500" : ""}
@@ -292,7 +306,7 @@ export function CierreDiaModal({ isOpen, onClose, onConfirmar, fecha, juegoNombr
                     type="number"
                     min="0"
                     step="0.01"
-                    value={datos.retencion || ''}
+                    value={datos.retencion}
                     onChange={(e) => handleInputChange('retencion', e.target.value)}
                     placeholder="0.00"
                     className={errors.retencion !== undefined ? "border-red-500" : ""}
@@ -305,7 +319,7 @@ export function CierreDiaModal({ isOpen, onClose, onConfirmar, fecha, juegoNombr
                     type="number"
                     min="0"
                     step="0.01"
-                    value={datos.caducos || ''}
+                    value={datos.caducos}
                     onChange={(e) => handleInputChange('caducos', e.target.value)}
                     placeholder="0.00"
                     className={errors.caducos !== undefined ? "border-red-500" : ""}
@@ -318,7 +332,7 @@ export function CierreDiaModal({ isOpen, onClose, onConfirmar, fecha, juegoNombr
                     type="number"
                     min="0"
                     step="0.01"
-                    value={datos.comision || ''}
+                    value={datos.comision}
                     onChange={(e) => handleInputChange('comision', e.target.value)}
                     placeholder="0.00"
                     className={errors.comision !== undefined ? "border-red-500" : ""}
@@ -331,7 +345,7 @@ export function CierreDiaModal({ isOpen, onClose, onConfirmar, fecha, juegoNombr
                     type="number"
                     min="0"
                     step="0.01"
-                    value={datos.premios || ''}
+                    value={datos.premios}
                     onChange={(e) => handleInputChange('premios', e.target.value)}
                     placeholder="0.00"
                     className={errors.premios !== undefined ? "border-red-500" : ""}

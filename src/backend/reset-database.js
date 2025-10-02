@@ -1,22 +1,96 @@
-import { executeQuery, testConnection, closePool } from '../config/database';
-import { logger } from '../utils/logger';
-import dotenv from 'dotenv';
+import mysql from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Script de migración para crear las tablas de la base de datos
+// Configuración de la base de datos
+const dbConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '3306'),
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'gastos_quinielas_db',
+  connectionLimit: 10,
+};
+
+// Crear pool de conexiones
+const pool = mysql.createPool({
+  ...dbConfig,
+  namedPlaceholders: true,
+  timezone: 'Z',
+  dateStrings: false,
+  supportBigNumbers: true,
+  bigNumberStrings: false,
+});
+
+// Función para ejecutar queries
+async function executeQuery(query, params = []) {
+  try {
+    const [rows] = await pool.execute(query, params);
+    return rows;
+  } catch (error) {
+    console.error('Database query error:', error);
+    console.error('Query:', query);
+    console.error('Params:', params);
+    throw error;
+  }
+}
+
+// Función para verificar conexión
+async function testConnection() {
+  try {
+    const connection = await pool.getConnection();
+    await connection.ping();
+    connection.release();
+    console.log('✅ Conexión a la base de datos establecida correctamente');
+    return true;
+  } catch (error) {
+    console.error('❌ Error conectando a la base de datos:', error);
+    return false;
+  }
+}
+
+// Función para eliminar todas las tablas
+async function dropAllTables() {
+  const tables = [
+    'password_reset_tokens',
+    'configuracion_horarios', 
+    'dias_finalizados',
+    'saldos_diarios',
+    'transacciones_quiniela',
+    'gastos',
+    'sesiones_usuario',
+    'usuarios'
+  ];
+
+  console.log('🗑️  Eliminando tablas existentes...');
+
+  // Deshabilitar foreign key checks temporalmente
+  await executeQuery('SET FOREIGN_KEY_CHECKS = 0');
+
+  for (const table of tables) {
+    try {
+      await executeQuery(`DROP TABLE IF EXISTS ${table}`);
+      console.log(`   ✅ Tabla ${table} eliminada`);
+    } catch (error) {
+      console.log(`   ⚠️  Tabla ${table} no existía`);
+    }
+  }
+
+  // Rehabilitar foreign key checks
+  await executeQuery('SET FOREIGN_KEY_CHECKS = 1');
+  console.log('✅ Todas las tablas eliminadas correctamente');
+}
+
+// Migraciones
 const migrations = [
   {
     name: 'create_usuarios_table',
     query: `
-      CREATE TABLE IF NOT EXISTS usuarios (
+      CREATE TABLE usuarios (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
         numero_quiniela VARCHAR(10) UNIQUE NOT NULL,
         nombre_quiniela VARCHAR(50) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -26,8 +100,9 @@ const migrations = [
         activo BOOLEAN DEFAULT TRUE,
         email_verificado BOOLEAN DEFAULT FALSE,
         
+        INDEX idx_username (username),
+        INDEX idx_username_activo (username, activo),
         INDEX idx_email (email),
-        INDEX idx_email_activo (email, activo),
         INDEX idx_numero_quiniela (numero_quiniela),
         INDEX idx_activo (activo)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -36,7 +111,7 @@ const migrations = [
   {
     name: 'create_sesiones_table',
     query: `
-      CREATE TABLE IF NOT EXISTS sesiones_usuario (
+      CREATE TABLE sesiones_usuario (
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
         session_token VARCHAR(255) UNIQUE NOT NULL,
@@ -59,7 +134,7 @@ const migrations = [
   {
     name: 'create_gastos_table',
     query: `
-      CREATE TABLE IF NOT EXISTS gastos (
+      CREATE TABLE gastos (
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
         monto DECIMAL(10,2) NOT NULL,
@@ -81,7 +156,7 @@ const migrations = [
   {
     name: 'create_transacciones_quiniela_table',
     query: `
-      CREATE TABLE IF NOT EXISTS transacciones_quiniela (
+      CREATE TABLE transacciones_quiniela (
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
         tipo ENUM('ingreso', 'egreso') NOT NULL,
@@ -105,7 +180,7 @@ const migrations = [
   {
     name: 'create_saldos_diarios_table',
     query: `
-      CREATE TABLE IF NOT EXISTS saldos_diarios (
+      CREATE TABLE saldos_diarios (
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
         fecha DATE NOT NULL,
@@ -124,7 +199,7 @@ const migrations = [
   {
     name: 'create_dias_finalizados_table',
     query: `
-      CREATE TABLE IF NOT EXISTS dias_finalizados (
+      CREATE TABLE dias_finalizados (
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
         fecha DATE NOT NULL,
@@ -139,7 +214,7 @@ const migrations = [
   {
     name: 'create_configuracion_horarios_table',
     query: `
-      CREATE TABLE IF NOT EXISTS configuracion_horarios (
+      CREATE TABLE configuracion_horarios (
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
         modalidad_id INT NOT NULL,
@@ -160,7 +235,7 @@ const migrations = [
   {
     name: 'create_password_reset_tokens_table',
     query: `
-      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      CREATE TABLE password_reset_tokens (
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
         reset_token VARCHAR(255) UNIQUE NOT NULL,
@@ -182,31 +257,74 @@ const migrations = [
 ];
 
 // Función para ejecutar una migración
-async function runMigration(migration: { name: string; query: string }) {
+async function runMigration(migration) {
   try {
-    logger.info(`Ejecutando migración: ${migration.name}`);
+    console.log(`Ejecutando migración: ${migration.name}`);
     await executeQuery(migration.query);
-    logger.info(`✅ Migración ${migration.name} completada exitosamente`);
+    console.log(`✅ Migración ${migration.name} completada exitosamente`);
     return true;
   } catch (error) {
-    logger.error(`❌ Error en migración ${migration.name}:`, error);
+    console.error(`❌ Error en migración ${migration.name}:`, error);
     return false;
   }
 }
 
-// Función principal de migración
-async function runMigrations() {
+// Función para crear usuario demo
+async function createDemoUser() {
   try {
-    logger.info('🚀 Iniciando migraciones de base de datos...');
+    // Verificar si ya existe el usuario demo
+    const existingUser = await executeQuery(
+      'SELECT id FROM usuarios WHERE email = ?',
+      ['admin@demo.com']
+    );
+    
+    if (existingUser.length > 0) {
+      console.log('👤 Usuario demo ya existe, saltando creación...');
+      return;
+    }
+    
+    // Crear usuario demo
+    const passwordHash = await bcrypt.hash('demo123', 12);
+    
+    await executeQuery(`
+      INSERT INTO usuarios (
+        username, numero_quiniela, nombre_quiniela, email, password_hash, activo
+      ) VALUES (?, ?, ?, ?, ?, 1)
+    `, [
+      'admin',
+      '12345',
+      'Usuario Demo',
+      'admin@demo.com',
+      passwordHash
+    ]);
+    
+    console.log('👤 Usuario demo creado exitosamente');
+    console.log('   👤 Usuario: admin');
+    console.log('   🔑 Contraseña: demo123');
+    
+  } catch (error) {
+    console.error('Error creando usuario demo:', error);
+  }
+}
+
+// Función principal
+async function resetDatabase() {
+  try {
+    console.log('🔄 REINICIANDO BASE DE DATOS COMPLETA...');
+    console.log('⚠️  ATENCIÓN: Esto eliminará TODOS los datos existentes');
     
     // Verificar conexión a la base de datos
     const connected = await testConnection();
     if (!connected) {
-      logger.error('❌ No se pudo conectar a la base de datos');
+      console.error('❌ No se pudo conectar a la base de datos');
       process.exit(1);
     }
     
-    // Ejecutar cada migración
+    // Eliminar todas las tablas
+    await dropAllTables();
+    
+    // Crear todas las tablas nuevamente
+    console.log('🚀 Creando tablas nuevas...');
     let successCount = 0;
     let errorCount = 0;
     
@@ -220,71 +338,37 @@ async function runMigrations() {
     }
     
     // Resumen final
-    logger.info(`📊 Resumen de migraciones:`);
-    logger.info(`   ✅ Exitosas: ${successCount}`);
-    logger.info(`   ❌ Fallidas: ${errorCount}`);
-    logger.info(`   📝 Total: ${migrations.length}`);
+    console.log(`📊 Resumen de migraciones:`);
+    console.log(`   ✅ Exitosas: ${successCount}`);
+    console.log(`   ❌ Fallidas: ${errorCount}`);
+    console.log(`   📝 Total: ${migrations.length}`);
     
     if (errorCount === 0) {
-      logger.info('🎉 ¡Todas las migraciones completadas exitosamente!');
+      console.log('🎉 ¡Base de datos reiniciada exitosamente!');
       
-      // Crear usuario demo si no existe
+      // Crear usuario demo
       await createDemoUser();
+      
+      console.log('');
+      console.log('🎯 REINICIO COMPLETO:');
+      console.log('   ✅ Todas las tablas eliminadas');
+      console.log('   ✅ Todas las tablas recreadas');
+      console.log('   ✅ Usuario demo configurado');
+      console.log('   ✅ Esquema actualizado correctamente');
+      
     } else {
-      logger.error('⚠️  Algunas migraciones fallaron. Revisa los logs para más detalles.');
+      console.error('⚠️  Algunas migraciones fallaron. Revisa los logs para más detalles.');
       process.exit(1);
     }
     
   } catch (error) {
-    logger.error('💥 Error crítico durante las migraciones:', error);
+    console.error('💥 Error crítico durante el reinicio:', error);
     process.exit(1);
   } finally {
-    await closePool();
+    await pool.end();
+    console.log('🔌 Pool de conexiones cerrado');
   }
 }
 
-// Función para crear usuario demo
-async function createDemoUser() {
-  try {
-    
-    // Verificar si ya existe el usuario demo
-    const existingUser = await executeQuery(
-      'SELECT id FROM usuarios WHERE email = ?',
-      ['admin@demo.com']
-    );
-    
-    if (existingUser.length > 0) {
-      logger.info('👤 Usuario demo ya existe, saltando creación...');
-      return;
-    }
-    
-    // Crear usuario demo
-    const passwordHash = await bcrypt.hash('demo123', 12);
-    
-    const userId = await executeQuery(`
-      INSERT INTO usuarios (
-        numero_quiniela, nombre_quiniela, email, password_hash, activo
-      ) VALUES (?, ?, ?, ?, 1)
-    `, [
-      '12345',
-      'Usuario Demo',
-      'admin@demo.com',
-      passwordHash
-    ]);
-    
-    logger.info('👤 Usuario demo creado exitosamente');
-    logger.info('   📧 Email: admin@demo.com');
-    logger.info('   🔑 Password: demo123');
-    logger.info('   🎲 Número Quiniela: 12345');
-    
-  } catch (error) {
-    logger.error('Error creando usuario demo:', error);
-  }
-}
-
-// Ejecutar migraciones si este archivo se ejecuta directamente
-if (import.meta.url === `file://${process.argv[1]}`) {
-  runMigrations();
-}
-
-export { runMigrations, createDemoUser };
+// Ejecutar reinicio
+resetDatabase();

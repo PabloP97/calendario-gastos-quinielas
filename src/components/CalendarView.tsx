@@ -106,7 +106,14 @@ export function CalendarView({ selectedDate, onDateSelect, diasFinalizados }: Ca
   // Función para verificar si un día está finalizado
   const isFinalized = (date: Date) => {
     const dateKey = date.toISOString().split('T')[0];
-    return diasFinalizados?.has(dateKey) || false;
+    const isFinalized = diasFinalizados?.has(dateKey) || false;
+    
+    // 🔧 AGREGADO: Log de debugging para verificar estado
+    if (isFinalized) {
+      console.log(`📅 Día ${dateKey} detectado como finalizado en calendario`);
+    }
+    
+    return isFinalized;
   };
 
   // Navegar meses

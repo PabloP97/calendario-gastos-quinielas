@@ -49,6 +49,7 @@ export interface ConfirmationActionData {
 // Interfaces de Autenticación
 export interface User {
   id: number;
+  username: string;
   nombre: string;
   email: string;
   numeroQuiniela?: string;
@@ -57,29 +58,19 @@ export interface User {
 }
 
 export interface LoginCredentials {
-  email: string;
+  username: string; // Nombre de usuario asignado por el administrador
   password: string;
-  rememberMe: boolean;
 }
 
-export interface RegisterData {
-  numeroQuiniela: string;
-  nombreQuiniela: string;
-  password: string;
-  confirmPassword: string;
-  preguntaSeguridad: string;
-  respuestaSeguridad: string;
-}
+// 🗑️ ELIMINADO: RegisterData - Ya no se permite registro público de usuarios
+// Los usuarios solo pueden ser creados por administradores desde el panel admin
 
-export interface PasswordRecoveryData {
-  email: string;
-}
+
 
 export interface Session {
   id: number;
   usuario_id: number;
   session_token: string;
-  remember_token?: string;
   ip_address?: string;
   user_agent?: string;
   fecha_creacion: string;

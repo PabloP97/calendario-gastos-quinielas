@@ -3,9 +3,9 @@ import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
 import { useConfirmation } from "./ui/use-confirmation";
 import { ConfirmationModal } from "./ConfirmationModal";
-import {
-  TrendingUp,
-  TrendingDown,
+import { 
+  TrendingUp, 
+  TrendingDown, 
   DollarSign,
   Calculator,
   Receipt,
@@ -44,7 +44,7 @@ interface ResumenFinancieroProps {
 
 export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior, isEditable, onFinalizarDia }: ResumenFinancieroProps) {
   const { isOpen, currentAction, showConfirmation, hideConfirmation } = useConfirmation();
-
+  
   // Función para convertir a número seguro
   const toNumber = (value: any): number => {
     const num = Number(value);
@@ -58,20 +58,20 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
       servicios: 'Servicios',
       otros: 'Otros'
     };
-
+    
     const nombreCategoria = categorias[gasto.categoria as keyof typeof categorias] || gasto.categoria;
-
+    
     if (gasto.subcategoria) {
       const subcategorias = {
         luz: 'Luz',
-        agua: 'Agua',
+        agua: 'Agua', 
         internet: 'Internet',
         alquiler: 'Alquiler'
       };
       const nombreSubcategoria = subcategorias[gasto.subcategoria as keyof typeof subcategorias] || gasto.subcategoria;
       return `${nombreCategoria} - ${nombreSubcategoria}`;
     }
-
+    
     return nombreCategoria;
   };
 
@@ -218,7 +218,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                   const juegoTransaccion = t.fuente === 'caja-interna' ? 'Caja Interna' : t.fuente;
                   return juegoTransaccion === juego;
                 });
-
+                
                 return (
                   <div key={juego} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
@@ -238,7 +238,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                   </div>
                 );
               })}
-
+              
               <Separator />
               <div className="flex items-center justify-between p-2">
                 <span>Total Ingresos</span>
@@ -273,7 +273,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                   const juegoTransaccion = t.fuente === 'caja-interna' ? 'Caja Interna' : t.fuente;
                   return juegoTransaccion === juego;
                 });
-
+                
                 // Agrupar transacciones por categoría para este juego
                 const transaccionesPorCategoria = transaccionesJuego.reduce((acc, t) => {
                   acc[t.categoria] = (acc[t.categoria] || 0) + toNumber(t.monto);
@@ -299,7 +299,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                         -${toNumber(monto).toFixed(2)}
                       </Badge>
                     </div>
-
+                    
                     {/* Desglose por categorías */}
                     <div className="p-2 space-y-1">
                       {Object.entries(transaccionesPorCategoria).map(([categoria, montoCategoria]) => (
@@ -312,7 +312,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                   </div>
                 );
               })}
-
+              
               <Separator />
               <div className="flex items-center justify-between p-2">
                 <span>Total Egresos</span>
@@ -338,7 +338,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
               <Calculator className="h-6 w-6" />
               <h3>Saldo Final del Día</h3>
             </div>
-
+            
             {/* Cálculo Visual */}
             <div className="bg-white/50 rounded-lg p-4 mb-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -364,7 +364,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                 </div>
               </div>
             </div>
-
+            
             <div className={`text-4xl mb-2 ${saldoFinal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               ${Math.abs(saldoFinal).toFixed(2)}
             </div>
@@ -372,11 +372,11 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
               {saldoFinal >= 0 ? '🎉 Saldo Final Positivo' : '⚠️ Saldo Final Negativo'}
             </p>
             <p className="text-muted-foreground text-sm">
-              {saldoFinal >= 0
+              {saldoFinal >= 0 
                 ? 'Este saldo se arrastrará al día siguiente'
                 : 'Deuda que se arrastrará al día siguiente'}
             </p>
-
+            
             {/* Botón Finalizar Día */}
             {isEditable && onFinalizarDia && (
               <div className="mt-6 pt-4 border-t border-border">
@@ -408,7 +408,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
           </div>
         </CardContent>
       </Card>
-
+      
       {/* Modal de Confirmación */}
       <ConfirmationModal
         isOpen={isOpen}

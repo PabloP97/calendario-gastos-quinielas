@@ -21,8 +21,11 @@
     "fixed-esm": "node start-backend-fixed-esm.js",
     "check-imports": "node verify-imports.js",
     "lint": "eslint src/**/*.ts",
-    "db:migrate": "node dist/database/migrate.js",
+    "db:migrate": "node --loader ts-node/esm src/database/migrate.ts",
+    "db:migrate-build": "tsc && node dist/database/migrate.js",
     "db:migrate-simple": "node src/database/migrate-simple.js",
+    "db:reset": "node reset-database.js",
+    "db:verify": "node verify-tables.js",
     "compile": "tsc && node dist/server.js"
   },
   "keywords": ["express", "typescript", "calendar", "gastos", "quinielas"],
