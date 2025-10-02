@@ -4,7 +4,16 @@
  * Reemplaza el sistema mock anterior
  */
 
-import { LoginCredentials, RegisterData, PasswordRecoveryData, User } from '../types';
+import { LoginCredentials, User } from '../types';
+
+interface AdminCreateUserData {
+  username: string;
+  email: string;
+  nombre: string;
+  nombreQuiniela: string;
+  numeroQuiniela: string;
+  password: string;
+}
 import { config, apiUrl, getAuthToken, setAuthToken, clearAuthToken } from './config';
 
 interface ApiResponse<T = any> {
@@ -32,7 +41,7 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = apiUrl(endpoint);
-
+    
     // Headers por defecto
     const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -59,23 +68,23 @@ class ApiService {
     try {
       // Realizar petición
       const response = await fetch(url, requestConfig);
-
+      
       // Verificar si la respuesta es exitosa
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-
+        
         try {
           const errorData = await response.json();
           errorMessage = errorData.message || errorData.error || errorMessage;
         } catch {
           // Si no se puede parsear como JSON, usar el mensaje por defecto
         }
-
+        
         // Si es 401, limpiar autenticación
         if (response.status === 401) {
           this.clearSession();
         }
-
+        
         throw new Error(errorMessage);
       }
 
@@ -87,7 +96,7 @@ class ApiService {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new Error(`Error de conexión al servidor en ${url}. Verifica tu conexión a internet.`);
       }
-
+      
       throw error;
     }
   }
@@ -123,16 +132,6 @@ class ApiService {
       this.currentUser = user;
       setAuthToken(token);
 
-      // Guardar sesión recordada si se solicita
-      if (credentials.rememberMe) {
-        localStorage.setItem(config.auth.sessionKey, JSON.stringify({
-          userId: user.id,
-          nombre: user.nombre,
-          email: user.email,
-          timestamp: Date.now()
-        }));
-      }
-
       return { user, token };
     } catch (error) {
       console.error('Error en login:', error);
@@ -141,28 +140,22 @@ class ApiService {
   }
 
   /**
-   * Registrar nuevo usuario (conecta a POST /api/v1/auth/register)
+   * Crear usuario desde panel de administración (conecta a POST /api/v1/auth/admin/create-user)
    */
-  async register(registerData: RegisterData): Promise<{ user: User; token: string }> {
+  async adminCreateUser(userData: AdminCreateUserData): Promise<boolean> {
     try {
-      const response: ApiResponse<{ user: User; token: string }> = await this.makeRequest('auth/register', {
+      const response: ApiResponse<{ user: User }> = await this.makeRequest('auth/admin/create-user', {
         method: 'POST',
-        body: JSON.stringify(registerData),
+        body: JSON.stringify(userData),
       });
 
-      if (!response.success || !response.data) {
-        throw new Error(response.message || 'Error en el registro');
+      if (!response.success) {
+        throw new Error(response.message || 'Error al crear usuario');
       }
 
-      // Guardar token y usuario
-      const { user, token } = response.data;
-      this.token = token;
-      this.currentUser = user;
-      setAuthToken(token);
-
-      return { user, token };
+      return true;
     } catch (error) {
-      console.error('Error en registro:', error);
+      console.error('Error creando usuario desde admin:', error);
       throw error;
     }
   }
@@ -192,22 +185,7 @@ class ApiService {
     }
   }
 
-  /**
-   * Recuperación de contraseña (conecta a POST /api/v1/auth/recover-password)
-   */
-  async sendPasswordRecovery(recoveryData: PasswordRecoveryData): Promise<boolean> {
-    try {
-      const response: ApiResponse<{ sent: boolean }> = await this.makeRequest('auth/recover-password', {
-        method: 'POST',
-        body: JSON.stringify(recoveryData),
-      });
 
-      return response.success;
-    } catch (error) {
-      console.error('Error en recuperación de contraseña:', error);
-      throw error;
-    }
-  }
 
   /**
    * Cerrar sesión (conecta a POST /api/v1/auth/logout)
@@ -429,6 +407,8 @@ class ApiService {
    */
   async obtenerDiasFinalizados(): Promise<string[]> {
     try {
+      console.log('🔍 Solicitando días finalizados al backend...');
+      
       const response: ApiResponse<string[]> = await this.makeRequest('saldos/dias-finalizados', {
         method: 'GET',
       });
@@ -437,9 +417,22 @@ class ApiService {
         throw new Error(response.message || 'Error obteniendo días finalizados');
       }
 
-      return response.data || [];
+      const diasFinalizados = response.data || [];
+      console.log('📅 Respuesta del backend - días finalizados:', diasFinalizados);
+      
+      // 🔧 VERIFICAR: Asegurar que todas las fechas están en formato correcto
+      const fechasFormateadas = diasFinalizados.map(fecha => {
+        // Si la fecha viene con hora, extraer solo la parte de fecha
+        if (fecha.includes('T')) {
+          return fecha.split('T')[0];
+        }
+        return fecha;
+      });
+      
+      console.log('📅 Fechas formateadas para frontend:', fechasFormateadas);
+      return fechasFormateadas;
     } catch (error) {
-      console.error('Error obteniendo días finalizados:', error);
+      console.error('❌ Error obteniendo días finalizados:', error);
       throw error;
     }
   }
@@ -448,11 +441,11 @@ class ApiService {
    * Finalizar día (conecta a POST /api/v1/saldos/finalizar-dia/:fecha)
    */
   async finalizarDia(fecha: string): Promise<boolean> {
-
     try {
       const response: ApiResponse<any> = await this.makeRequest(`saldos/finalizar-dia/${fecha}`, {
         method: 'POST',
       });
+
       if (!response.success) {
         throw new Error(response.message || 'Error finalizando día');
       }
@@ -479,6 +472,84 @@ class ApiService {
       }
     } catch (error) {
       console.error('Error guardando saldo final:', error);
+      throw error;
+    }
+  }
+
+  // ======================================
+  // MÉTODOS PARA HORARIOS DE QUINIELAS
+  // ======================================
+
+  /**
+   * Obtener horarios configurados de quinielas (conecta a GET /api/v1/quinielas/horarios)
+   */
+  async obtenerHorariosQuiniela(): Promise<any[]> {
+    try {
+      console.log('🔍 Solicitando horarios de quiniela al backend...');
+      
+      const response: ApiResponse<any[]> = await this.makeRequest('quinielas/horarios', {
+        method: 'GET',
+      });
+
+      if (!response.success) {
+        throw new Error(response.message || 'Error obteniendo horarios de quiniela');
+      }
+
+      const horarios = response.data || [];
+      console.log('⏰ Horarios de quiniela obtenidos del backend:', horarios);
+      
+      return horarios;
+    } catch (error) {
+      console.error('❌ Error obteniendo horarios de quiniela:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Actualizar horarios de quinielas (conecta a POST /api/v1/quinielas/horarios)
+   */
+  async actualizarHorariosQuiniela(horarios: any[]): Promise<boolean> {
+    try {
+      console.log('💾 Guardando horarios de quiniela en backend...', horarios);
+      
+      const response: ApiResponse = await this.makeRequest('quinielas/horarios', {
+        method: 'POST',
+        body: JSON.stringify({ horarios }),
+      });
+
+      if (!response.success) {
+        throw new Error(response.message || 'Error actualizando horarios de quiniela');
+      }
+
+      console.log('✅ Horarios de quiniela actualizados exitosamente');
+      return true;
+    } catch (error) {
+      console.error('❌ Error actualizando horarios de quiniela:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener estado actual de modalidades (abiertas/cerradas) (conecta a GET /api/v1/quinielas/estado-modalidades)
+   */
+  async obtenerEstadoModalidades(): Promise<any[]> {
+    try {
+      console.log('🔍 Consultando estado actual de modalidades...');
+      
+      const response: ApiResponse<any[]> = await this.makeRequest('quinielas/estado-modalidades', {
+        method: 'GET',
+      });
+
+      if (!response.success) {
+        throw new Error(response.message || 'Error obteniendo estado de modalidades');
+      }
+
+      const estadoModalidades = response.data || [];
+      console.log('📊 Estado de modalidades obtenido:', estadoModalidades);
+      
+      return estadoModalidades;
+    } catch (error) {
+      console.error('❌ Error obteniendo estado de modalidades:', error);
       throw error;
     }
   }
@@ -527,7 +598,7 @@ export default apiService;
 
 /**
  * ApiService - Servicio para comunicación con el backend
- *
+ * 
  * Maneja toda la comunicación HTTP con el servidor backend:
  * - Autenticación JWT con Bearer tokens
  * - Manejo de errores HTTP y de red

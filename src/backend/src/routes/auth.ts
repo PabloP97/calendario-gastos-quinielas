@@ -5,12 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { executeQuery, executeInsert } from '../config/database';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { authenticateToken } from '../middleware/auth';
-import { validateData, loginSchema, registerSchema, passwordRecoverySchema } from '../utils/validation';
+import { validateData, loginSchema } from '../utils/validation';
 import { logger } from '../utils/logger';
 import { 
   User, 
   LoginCredentials, 
-  RegisterData, 
   PasswordRecoveryData,
   JwtPayload,
   DbUser 
@@ -22,14 +21,14 @@ const router = express.Router();
 router.post('/login', asyncHandler(async (req, res) => {
   const credentials: LoginCredentials = validateData(loginSchema, req.body);
   
-  // Buscar usuario por email o número de quiniela
+  // Buscar usuario por username
   const userQuery = `
-    SELECT id, nombre, email, numero_quiniela, password_hash, activo
+    SELECT id, username, nombre_quiniela, email, numero_quiniela, password_hash, activo
     FROM usuarios 
-    WHERE (email = ? OR numero_quiniela = ?) AND activo = 1
+    WHERE username = ? AND activo = 1
   `;
   
-  const users = await executeQuery<DbUser>(userQuery, [credentials.email, credentials.email]);
+  const users = await executeQuery<DbUser>(userQuery, [credentials.username]);
   
   if (users.length === 0) {
     throw createError('Credenciales inválidas', 401);
@@ -46,8 +45,9 @@ router.post('/login', asyncHandler(async (req, res) => {
   // Generar tokens JWT
   const payload: JwtPayload = {
     userId: user.id,
+    username: user.username,
     email: user.email,
-    nombre: user.nombre
+    nombre: user.nombre_quiniela
   };
   
   const token = jwt.sign(payload, process.env.JWT_SECRET!, {
@@ -64,7 +64,7 @@ router.post('/login', asyncHandler(async (req, res) => {
   expirationDate.setHours(expirationDate.getHours() + 24); // 24 horas
   
   const sessionQuery = `
-    INSERT INTO sesiones (
+    INSERT INTO sesiones_usuario (
       usuario_id, session_token, remember_token, ip_address, 
       user_agent, fecha_expiracion, activo
     ) VALUES (?, ?, ?, ?, ?, ?, 1)
@@ -85,13 +85,14 @@ router.post('/login', asyncHandler(async (req, res) => {
   // Preparar respuesta del usuario (sin password)
   const userResponse: User = {
     id: user.id,
-    nombre: user.nombre,
+    username: user.username,
+    nombre: user.nombre_quiniela,
     email: user.email,
-    numeroQuiniela: user.numero_quiniela,
+    numeroQuiniela: user.numero_quiniela || null,
     ultimo_acceso: new Date().toISOString()
   };
   
-  logger.info(`Usuario ${user.email} ha iniciado sesión`, { userId: user.id });
+  logger.info(`Usuario ${user.username} (${user.numero_quiniela || 'sin número'}) ha iniciado sesión`, { userId: user.id });
   
   res.json({
     success: true,
@@ -103,90 +104,114 @@ router.post('/login', asyncHandler(async (req, res) => {
   });
 }));
 
-// POST /api/v1/auth/register
-router.post('/register', asyncHandler(async (req, res) => {
-  const registerData: RegisterData = validateData(registerSchema, req.body);
+// POST /api/v1/auth/admin/create-user - Crear usuario desde panel de administración
+router.post('/admin/create-user', asyncHandler(async (req, res) => {
+  const { username, email, nombre, nombreQuiniela, numeroQuiniela, password } = req.body;
   
-  // Verificar si ya existe usuario con ese email o número de quiniela
-  const existingUserQuery = `
-    SELECT id FROM usuarios 
-    WHERE email = ? OR numero_quiniela = ?
+  // TODO: SP_INSERT - Crear usuario desde panel de administración
+  // EXEC SP_AdminCreateUser @username = ?, @email = ?, @nombre = ?, @nombre_quiniela = ?, @password_hash = ?
+  
+  // Validación básica
+  if (!username || !email || !nombre || !nombreQuiniela || !numeroQuiniela || !password) {
+    throw createError('Todos los campos son requeridos', 400);
+  }
+  
+  if (username.length > 50 || email.length > 100 || nombre.length > 50 || nombreQuiniela.length > 100) {
+    throw createError('Uno o más campos exceden la longitud máxima', 400);
+  }
+  
+  // Validar username
+  if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+    throw createError('El nombre de usuario solo puede contener letras, números, guiones y guiones bajos', 400);
+  }
+  
+  if (username.length < 3 || username.length > 50) {
+    throw createError('El nombre de usuario debe tener entre 3 y 50 caracteres', 400);
+  }
+  
+  // Validar número de quiniela
+  if (!/^\d+$/.test(numeroQuiniela)) {
+    throw createError('El número de quiniela solo puede contener dígitos', 400);
+  }
+  
+  if (numeroQuiniela.length < 4 || numeroQuiniela.length > 15) {
+    throw createError('El número de quiniela debe tener entre 4 y 15 dígitos', 400);
+  }
+  
+  if (password.length < 6) {
+    throw createError('La contraseña debe tener al menos 6 caracteres', 400);
+  }
+  
+  // Verificar si ya existe usuario con ese username
+  const existingUserByUsernameQuery = `
+    SELECT id FROM usuarios WHERE username = ?
   `;
   
-  const email = `${registerData.numeroQuiniela}@quiniela.com`;
-  const existingUsers = await executeQuery(existingUserQuery, [email, registerData.numeroQuiniela]);
+  const existingUsersByUsername = await executeQuery(existingUserByUsernameQuery, [username]);
   
-  if (existingUsers.length > 0) {
-    throw createError('Ya existe un usuario con ese número de quiniela', 409);
+  if (existingUsersByUsername.length > 0) {
+    throw createError('Ya existe un usuario con este nombre de usuario', 409);
+  }
+  
+  // Verificar si ya existe usuario con ese email
+  const existingUserByEmailQuery = `
+    SELECT id FROM usuarios WHERE email = ?
+  `;
+  
+  const existingUsersByEmail = await executeQuery(existingUserByEmailQuery, [email]);
+  
+  if (existingUsersByEmail.length > 0) {
+    throw createError('Ya existe un usuario con este email', 409);
+  }
+  
+  // Verificar si ya existe usuario con ese número de quiniela
+  const existingUserByNumeroQuery = `
+    SELECT id FROM usuarios WHERE numero_quiniela = ?
+  `;
+  
+  const existingUsersByNumero = await executeQuery(existingUserByNumeroQuery, [numeroQuiniela]);
+  
+  if (existingUsersByNumero.length > 0) {
+    throw createError('Ya existe un usuario con este número de quiniela', 409);
   }
   
   // Hash de la contraseña
   const saltRounds = parseInt(process.env.BCRYPT_ROUNDS || '12');
-  const passwordHash = await bcrypt.hash(registerData.password, saltRounds);
-  const respuestaSecurityHash = await bcrypt.hash(registerData.respuestaSeguridad.toLowerCase(), saltRounds);
+  const passwordHash = await bcrypt.hash(password, saltRounds);
   
-  // Crear usuario
+  // Crear usuario con el username y número de quiniela proporcionado por el administrador
   const createUserQuery = `
     INSERT INTO usuarios (
-      nombre, email, numero_quiniela, password_hash, 
-      pregunta_seguridad, respuesta_seguridad_hash, activo
-    ) VALUES (?, ?, ?, ?, ?, ?, 1)
-  `;
-  
-  const userId = await executeInsert(createUserQuery, [
-    registerData.nombreQuiniela,
-    email,
-    registerData.numeroQuiniela,
-    passwordHash,
-    registerData.preguntaSeguridad,
-    respuestaSecurityHash
-  ]);
-  
-  // Generar token para el usuario recién creado
-  const payload: JwtPayload = {
-    userId,
-    email,
-    nombre: registerData.nombreQuiniela
-  };
-  
-  const token = jwt.sign(payload, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '24h'
-  } as jwt.SignOptions);
-  
-  // Crear sesión automática
-  const expirationDate = new Date();
-  expirationDate.setHours(expirationDate.getHours() + 24);
-  
-  const sessionQuery = `
-    INSERT INTO sesiones (
-      usuario_id, session_token, ip_address, user_agent, fecha_expiracion, activo
+      username, numero_quiniela, nombre_quiniela, email, password_hash, activo
     ) VALUES (?, ?, ?, ?, ?, 1)
   `;
   
-  await executeInsert(sessionQuery, [
-    userId,
-    token,
-    req.ip,
-    req.get('User-Agent'),
-    expirationDate
+  const userId = await executeInsert(createUserQuery, [
+    username,
+    numeroQuiniela,
+    nombreQuiniela,
+    email,
+    passwordHash
   ]);
   
-  const userResponse: User = {
+  // Preparar respuesta del usuario creado
+  const userResponse = {
     id: userId,
-    nombre: registerData.nombreQuiniela,
-    email,
-    numeroQuiniela: registerData.numeroQuiniela,
+    username: username,
+    nombre: nombre,
+    email: email,
+    nombreQuiniela: nombreQuiniela,
+    numeroQuiniela: numeroQuiniela,
     fecha_creacion: new Date().toISOString()
   };
   
-  logger.info(`Nuevo usuario registrado: ${email}`, { userId });
+  logger.info(`Nuevo usuario creado por administrador: ${username} (${email})`, { userId });
   
   res.status(201).json({
     success: true,
-    message: 'Usuario registrado exitosamente',
+    message: 'Usuario creado exitosamente',
     data: {
-      user: userResponse,
-      token
+      user: userResponse
     }
   });
 }));
@@ -195,8 +220,11 @@ router.post('/register', asyncHandler(async (req, res) => {
 router.post('/recover-password', asyncHandler(async (req, res) => {
   const recoveryData: PasswordRecoveryData = validateData(passwordRecoverySchema, req.body);
   
+  // TODO: SP_SELECT - Verificar si existe el email
+  // EXEC SP_GetUserByEmail @email = ?
+  
   // Verificar si existe el email
-  const userQuery = 'SELECT id, nombre FROM usuarios WHERE email = ? AND activo = 1';
+  const userQuery = 'SELECT id, nombre_quiniela FROM usuarios WHERE email = ? AND activo = 1';
   const users = await executeQuery(userQuery, [recoveryData.email]);
   
   if (users.length === 0) {
@@ -215,7 +243,7 @@ router.post('/recover-password', asyncHandler(async (req, res) => {
   if (process.env.MOCK_EMAIL === 'true') {
     logger.info(`Mock: Email de recuperación enviado a ${recoveryData.email}`, {
       userId: user.id,
-      userName: user.nombre
+      userName: user.nombre_quiniela
     });
   } else {
     // TODO: Implementar envío real de email
@@ -230,59 +258,40 @@ router.post('/recover-password', asyncHandler(async (req, res) => {
 
 // POST /api/v1/auth/validate-session
 router.post('/validate-session', authenticateToken, asyncHandler(async (req, res) => {
-  const userId = req.user!.userId;
+  // TODO: SP_SELECT - Validar sesión de usuario
+  // EXEC SP_ValidateUserSession @user_id = ?
   
-  // Obtener información actualizada del usuario
-  const userQuery = `
-    SELECT id, nombre, email, numero_quiniela, ultimo_acceso, fecha_creacion
-    FROM usuarios 
-    WHERE id = ? AND activo = 1
-  `;
-  
-  const users = await executeQuery<DbUser>(userQuery, [userId]);
-  
-  if (users.length === 0) {
-    throw createError('Usuario no encontrado', 404);
-  }
-  
-  const user = users[0];
-  
-  const userResponse: User = {
-    id: user.id,
-    nombre: user.nombre,
-    email: user.email,
-    numeroQuiniela: user.numero_quiniela,
-    ultimo_acceso: user.ultimo_acceso ? user.ultimo_acceso.toISOString() : undefined,
-    fecha_creacion: user.fecha_creacion ? user.fecha_creacion.toISOString() : undefined
-  };
+  // Si llegamos aquí, el token es válido (verificado por el middleware)
+  const user = req.user!;
   
   res.json({
     success: true,
     message: 'Sesión válida',
-    data: userResponse
+    data: user
   });
 }));
 
 // POST /api/v1/auth/logout
 router.post('/logout', authenticateToken, asyncHandler(async (req, res) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  // TODO: SP_UPDATE - Desactivar sesión de usuario
+  // EXEC SP_DeactivateUserSession @user_id = ?
+  
+  const userId = req.user!.userId;
+  const token = req.get('Authorization')?.replace('Bearer ', '');
   
   if (token) {
-    // Marcar sesión como inactiva
+    // Desactivar la sesión en la base de datos
     await executeQuery(
-      'UPDATE sesiones SET activo = 0 WHERE session_token = ?',
-      [token]
+      'UPDATE sesiones_usuario SET activo = 0 WHERE usuario_id = ? AND session_token = ?',
+      [userId, token]
     );
   }
   
-  logger.info(`Usuario ${req.user!.email} ha cerrado sesión`, { 
-    userId: req.user!.userId 
-  });
+  logger.info(`Usuario ${userId} ha cerrado sesión`);
   
   res.json({
     success: true,
-    message: 'Sesión cerrada exitosamente'
+    message: 'Logout exitoso'
   });
 }));
 

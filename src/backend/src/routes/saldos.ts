@@ -16,12 +16,14 @@ router.get('/dias-finalizados', asyncHandler(async (req, res) => {
   const userId = req.user!.userId;
 
   const query = `
-    SELECT fecha FROM dias_finalizados
+    SELECT DATE_FORMAT(fecha, '%Y-%m-%d') as fecha FROM dias_finalizados
     WHERE usuario_id = ?
     ORDER BY fecha DESC
   `;
 
   const diasFinalizados = await executeQuery(query, [userId]);
+
+  // Asegurar que retornamos un array de strings en formato correcto
   const fechas = diasFinalizados.map((dia: any) => dia.fecha);
 
   res.json({
@@ -40,7 +42,7 @@ router.get('/datos-dia/:fecha', asyncHandler(async (req, res) => {
   const gastosQuery = `
     SELECT id, monto, categoria, subcategoria, descripcion, fecha
     FROM gastos
-    WHERE usuario_id = ? AND fecha = ?
+    WHERE usuario_id = ? AND fecha = ? AND activo = TRUE
     ORDER BY id DESC
   `;
 
@@ -50,7 +52,7 @@ router.get('/datos-dia/:fecha', asyncHandler(async (req, res) => {
   const quinielasQuery = `
     SELECT id, tipo, categoria, monto, descripcion, fecha, fuente
     FROM transacciones_quiniela
-    WHERE usuario_id = ? AND fecha = ?
+    WHERE usuario_id = ? AND fecha = ? AND activo = TRUE
     ORDER BY id DESC
   `;
 
@@ -100,6 +102,7 @@ router.get('/saldo-anterior/:fecha', asyncHandler(async (req, res) => {
 router.post('/finalizar-dia/:fecha', asyncHandler(async (req, res) => {
   const { fecha } = validateData(fechaParamSchema, req.params);
   const userId = req.user!.userId;
+
   // Verificar que el día no esté ya finalizado
   const finalizadoQuery = `
     SELECT id FROM dias_finalizados
@@ -128,30 +131,50 @@ router.post('/finalizar-dia/:fecha', asyncHandler(async (req, res) => {
   const gastosQuery = `
     SELECT COALESCE(SUM(monto), 0) as total_gastos
     FROM gastos
-    WHERE usuario_id = ? AND fecha = ?
+    WHERE usuario_id = ? AND fecha = ? AND activo = TRUE
   `;
 
   const gastosResult = await executeQuery(gastosQuery, [userId, fecha]);
-  const totalGastos = gastosResult[0]?.total_gastos || 0;
+  const totalGastos = parseFloat(gastosResult[0]?.total_gastos || 0);
 
   // Obtener ingresos y egresos de quiniela del día
   const ingresosQuery = `
     SELECT COALESCE(SUM(monto), 0) as total_ingresos
     FROM transacciones_quiniela
-    WHERE usuario_id = ? AND fecha = ? AND tipo = 'ingreso'
+    WHERE usuario_id = ? AND fecha = ? AND tipo = 'ingreso' AND activo = TRUE
   `;
+
   const egresosQuery = `
     SELECT COALESCE(SUM(monto), 0) as total_egresos
     FROM transacciones_quiniela
-    WHERE usuario_id = ? AND fecha = ? AND tipo = 'egreso'
+    WHERE usuario_id = ? AND fecha = ? AND tipo = 'egreso' AND activo = TRUE
   `;
+
   const ingresosResult = await executeQuery(ingresosQuery, [userId, fecha]);
   const egresosResult = await executeQuery(egresosQuery, [userId, fecha]);
-  const totalIngresos = ingresosResult[0]?.total_ingresos || 0;
-  const totalEgresosQuiniela = egresosResult[0]?.total_egresos || 0;
-  console.log(`typeof: ${typeof(totalEgresosQuiniela)}`)
-  const totalEgresos = totalGastos + totalEgresosQuiniela;
-  const saldoFinal = saldoAnterior + totalIngresos - totalEgresos;
+
+  const totalIngresos = parseFloat(ingresosResult[0]?.total_ingresos || 0);
+  const totalEgresosQuiniela = parseFloat(egresosResult[0]?.total_egresos || 0);
+
+  // 🔧 CORREGIDO: Formatear todos los valores como decimales de 2 posiciones
+  const totalEgresos = parseFloat(totalGastos) + totalEgresosQuiniela;
+  const saldoFinal = parseFloat(saldoAnterior) + totalIngresos - totalEgresos;
+
+  // 🔧 CORREGIDO: Validar que no haya NaN y formatear a 2 decimales
+  const saldoAnteriorFormateado = isNaN(saldoAnterior) ? 0 : parseFloat(saldoAnterior.toFixed(2));
+  const totalIngresosFormateado = isNaN(totalIngresos) ? 0 : parseFloat(totalIngresos.toFixed(2));
+  const totalEgresosFormateado = isNaN(totalEgresos) ? 0 : parseFloat(totalEgresos.toFixed(2));
+  const saldoFinalFormateado = isNaN(saldoFinal) ? 0 : parseFloat(saldoFinal.toFixed(2));
+
+  // 🔧 DEBUG: Log de valores antes de insertar
+  console.log('💰 Finalizando día - Valores calculados:', {
+    fecha,
+    saldoAnterior: saldoAnteriorFormateado,
+    totalIngresos: totalIngresosFormateado,
+    totalEgresos: totalEgresosFormateado,
+    saldoFinal: saldoFinalFormateado
+  });
+
   // Guardar el saldo final del día
   const saldoQuery = `
     INSERT INTO saldos_diarios (usuario_id, fecha, saldo_inicial_dia, total_ingresos, total_egresos, saldo_final_dia)
@@ -162,13 +185,14 @@ router.post('/finalizar-dia/:fecha', asyncHandler(async (req, res) => {
     total_egresos = VALUES(total_egresos),
     saldo_final_dia = VALUES(saldo_final_dia)
   `;
+
   await executeQuery(saldoQuery, [
     userId,
     fecha,
-    saldoAnterior,
-    totalIngresos,
-    totalEgresos,
-    saldoFinal
+    saldoAnteriorFormateado,
+    totalIngresosFormateado,
+    totalEgresosFormateado,
+    saldoFinalFormateado
   ]);
 
   // Marcar el día como finalizado
@@ -221,7 +245,8 @@ async function obtenerSaldoAnterior(userId: number, fecha: string): Promise<numb
   const saldoResult = await executeQuery(saldoQuery, [userId, fechaAnteriorStr]);
 
   if (saldoResult.length > 0) {
-    return saldoResult[0].saldo_final_dia;
+    const saldo = parseFloat(saldoResult[0].saldo_final_dia || 0);
+    return isNaN(saldo) ? 0 : parseFloat(saldo.toFixed(2));
   }
 
   // Si no hay saldo guardado del día anterior, calcularlo desde el principio del mes
@@ -247,21 +272,21 @@ async function calcularSaldoAcumulado(userId: number, fechaHasta: string): Promi
   const gastosQuery = `
     SELECT COALESCE(SUM(monto), 0) as total_gastos
     FROM gastos
-    WHERE usuario_id = ? AND fecha >= ? AND fecha <= ?
+    WHERE usuario_id = ? AND fecha >= ? AND fecha <= ? AND activo = TRUE
   `;
 
   // Obtener todos los ingresos del período
   const ingresosQuery = `
     SELECT COALESCE(SUM(monto), 0) as total_ingresos
     FROM transacciones_quiniela
-    WHERE usuario_id = ? AND fecha >= ? AND fecha <= ? AND tipo = 'ingreso'
+    WHERE usuario_id = ? AND fecha >= ? AND fecha <= ? AND tipo = 'ingreso' AND activo = TRUE
   `;
 
   // Obtener todos los egresos de quiniela del período
   const egresosQuery = `
     SELECT COALESCE(SUM(monto), 0) as total_egresos
     FROM transacciones_quiniela
-    WHERE usuario_id = ? AND fecha >= ? AND fecha <= ? AND tipo = 'egreso'
+    WHERE usuario_id = ? AND fecha >= ? AND fecha <= ? AND tipo = 'egreso' AND activo = TRUE
   `;
 
   const [gastosResult, ingresosResult, egresosResult] = await Promise.all([
@@ -270,13 +295,16 @@ async function calcularSaldoAcumulado(userId: number, fechaHasta: string): Promi
     executeQuery(egresosQuery, [userId, primerDiaMesStr, fechaAnteriorStr])
   ]);
 
-  const totalGastos = gastosResult[0]?.total_gastos || 0;
-  const totalIngresos = ingresosResult[0]?.total_ingresos || 0;
-  const totalEgresosQuiniela = egresosResult[0]?.total_egresos || 0;
+  const totalGastos = parseFloat(gastosResult[0]?.total_gastos || 0);
+  const totalIngresos = parseFloat(ingresosResult[0]?.total_ingresos || 0);
+  const totalEgresosQuiniela = parseFloat(egresosResult[0]?.total_egresos || 0);
 
   const saldoAcumulado = totalIngresos - (totalGastos + totalEgresosQuiniela);
 
-  return saldoAcumulado;
+  // 🔧 CORREGIDO: Formatear y validar el resultado
+  const saldoFormateado = isNaN(saldoAcumulado) ? 0 : parseFloat(saldoAcumulado.toFixed(2));
+
+  return saldoFormateado;
 }
 
 export default router;

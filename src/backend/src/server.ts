@@ -25,7 +25,7 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 // Configuración de Rate Limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutos
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // límite de requests por IP
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000'), // límite de requests por IP
   message: {
     success: false,
     message: 'Demasiadas solicitudes desde esta IP, inténtalo de nuevo más tarde.'
@@ -36,7 +36,7 @@ const limiter = rateLimit({
 
 // Configuración de CORS
 const corsOptions = {
-  origin: 'https://calendario-gastos-quinielas.vercel.app',
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: process.env.CORS_CREDENTIALS === 'true',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

@@ -2,13 +2,21 @@ import { useState, useEffect } from "react";
 import { CalendarView } from "./components/CalendarView";
 import { DayDetailsPanel } from "./components/DayDetailsPanel";
 import { LoginForm } from "./components/LoginForm";
-import { RegisterForm } from "./components/RegisterForm";
-import { PasswordRecoveryForm } from "./components/PasswordRecoveryForm";
+
+import { AdminUserManagement } from "./components/AdminUserManagement";
+import { AdminSecretAccess } from "./components/AdminSecretAccess";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
 import { Loader2, LogOut } from "lucide-react";
-import { User, LoginCredentials, RegisterData, PasswordRecoveryData } from "./types";
+import { User, LoginCredentials } from "./types";
 import apiService from "./services/apiService";
+
+// 🔧 AGREGADO: Función helper para normalizar fechas
+const normalizarFecha = (fecha: string): string => {
+  // Convertir cualquier formato de fecha a YYYY-MM-DD
+  const date = new Date(fecha);
+  return date.toISOString().split('T')[0];
+};
 
 export default function App() {
   // Estados de autenticación
@@ -16,21 +24,57 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [isRecoveringPassword, setIsRecoveringPassword] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [showPasswordRecovery, setShowPasswordRecovery] = useState(false);
+
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showAdminSecretAccess, setShowAdminSecretAccess] = useState(false);
+  const [isValidatingSecret, setIsValidatingSecret] = useState(false);
 
   // Estados existentes
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isLoadingDay, setIsLoadingDay] = useState(false);
   const [diasFinalizados, setDiasFinalizados] = useState<Set<string>>(new Set());
+  const [calendarKey, setCalendarKey] = useState(0);
 
   // TODO: SP_SELECT - Al cargar la aplicación, verificar sesión existente
   // EXEC SP_ValidateSession @session_token = ?
-
+  
   // TODO: SP_SELECT - Al cargar la aplicación autenticada, ejecutar SP para obtener todos los días finalizados
   // EXEC SP_GetDiasFinalizados @usuario_id = ?
+
+  // 🔧 AGREGADO: useEffect para detectar cambios en diasFinalizados
+  useEffect(() => {
+    console.log('👀 Cambio detectado en diasFinalizados:', diasFinalizados);
+  }, [diasFinalizados]);
+
+  // 🔐 NUEVO: useEffect para detectar URL de administración
+  useEffect(() => {
+    const checkAdminURL = () => {
+      const currentPath = window.location.pathname;
+      const currentHash = window.location.hash;
+      
+      // Detectar rutas de administración: /admin, /#admin, /#/admin
+      const isAdminRoute = currentPath === '/admin' || 
+                          currentHash === '#admin' || 
+                          currentHash === '#/admin' ||
+                          currentPath.includes('/admin');
+      
+      if (isAdminRoute && !isAuthenticated) {
+        setShowAdminSecretAccess(true);
+        console.log('🔐 Acceso administrativo detectado - mostrando verificación de seguridad');
+      }
+    };
+
+    checkAdminURL();
+    
+    // Escuchar cambios en la URL
+    window.addEventListener('popstate', checkAdminURL);
+    window.addEventListener('hashchange', checkAdminURL);
+    
+    return () => {
+      window.removeEventListener('popstate', checkAdminURL);
+      window.removeEventListener('hashchange', checkAdminURL);
+    };
+  }, [isAuthenticated]);
 
   // Verificar sesión existente al cargar la aplicación
   useEffect(() => {
@@ -38,19 +82,30 @@ export default function App() {
       try {
         // Validar sesión con el backend real
         const user = await apiService.validateSession();
-
+        
         if (user) {
           setCurrentUser(user);
           setIsAuthenticated(true);
-
-          // Cargar días finalizados para el usuario autenticado
+          
+          // 🔧 AGREGADO: Logs de debugging para días finalizados
+          console.log('🔍 Cargando días finalizados del usuario:', user.id);
           const diasFinalizadosArray = await apiService.obtenerDiasFinalizados();
-          setDiasFinalizados(new Set(diasFinalizadosArray));
-
-          toast.success(`Sesión restaurada`, {
-            description: `Bienvenido de nuevo, ${user.nombre}`,
-            duration: 2000,
-          });
+          console.log('📅 Días finalizados obtenidos del backend:', diasFinalizadosArray);
+          
+          const diasFinalizadosNormalizados = diasFinalizadosArray.map(normalizarFecha);
+          console.log('📅 Días finalizados normalizados:', diasFinalizadosNormalizados);
+          
+          const diasFinalizadosSet = new Set(diasFinalizadosNormalizados);
+          console.log('🗂️ Set de días finalizados creado:', diasFinalizadosSet);
+          
+          setDiasFinalizados(diasFinalizadosSet);
+          console.log('✅ Estado actualizado - días finalizados establecidos');
+          
+          // 🔧 COMENTADO: Toast de sesión restaurada que molesta al usuario
+          // toast.success(`Sesión restaurada`, {
+          //   description: `Bienvenido de nuevo, ${user.nombre}`,
+          //   duration: 2000,
+          // });
         }
       } catch (error) {
         console.error("Error verificando sesión:", error);
@@ -68,31 +123,41 @@ export default function App() {
   // Función para manejar el login
   const handleLogin = async (credentials: LoginCredentials): Promise<boolean> => {
     setIsLoggingIn(true);
-
+    
     try {
       // Realizar login con el backend real
       const { user, token } = await apiService.login(credentials);
-
+      
       setCurrentUser(user);
       setIsAuthenticated(true);
-
-      // Cargar días finalizados del usuario autenticado
+      
+      // 🔧 AGREGADO: Logs de debugging para login
+      console.log('🔍 Login exitoso, cargando días finalizados del usuario:', user.id);
       const diasFinalizadosArray = await apiService.obtenerDiasFinalizados();
-      setDiasFinalizados(new Set(diasFinalizadosArray));
-
+      console.log('📅 Días finalizados obtenidos en login:', diasFinalizadosArray);
+      
+      const diasFinalizadosNormalizados = diasFinalizadosArray.map(normalizarFecha);
+      console.log('📅 Días finalizados normalizados en login:', diasFinalizadosNormalizados);
+      
+      const diasFinalizadosSet = new Set(diasFinalizadosNormalizados);
+      console.log('🗂️ Set de días finalizados en login:', diasFinalizadosSet);
+      
+      setDiasFinalizados(diasFinalizadosSet);
+      console.log('✅ Estado login actualizado - días finalizados establecidos');
+      
       // Mostrar notificación de bienvenida
       toast.success(`¡Bienvenido, ${user.nombre}!`, {
         description: "Has iniciado sesión correctamente",
         duration: 3000,
       });
-
+      
       return true;
     } catch (error) {
       console.error("Error durante el login:", error);
-
+      
       let errorMessage = "Credenciales inválidas";
       let errorDescription = "Verifica tu email y contraseña";
-
+      
       if (error instanceof Error) {
         if (error.message.includes('Error de conexión')) {
           errorMessage = "Servicio no disponible";
@@ -102,7 +167,7 @@ export default function App() {
           errorDescription = error.message;
         }
       }
-
+      
       toast.error(errorMessage, {
         description: errorDescription,
         duration: 6000,
@@ -113,76 +178,91 @@ export default function App() {
     }
   };
 
-  // Función para manejar el registro
-  const handleRegister = async (registerData: RegisterData): Promise<boolean> => {
-    setIsRegistering(true);
-
+  // 🔐 NUEVO: Función para validar clave secreta administrativa
+  const handleValidateSecretKey = async (secretKey: string): Promise<boolean> => {
+    setIsValidatingSecret(true);
+    
     try {
-      // Realizar registro con el backend real
-      const { user, token } = await apiService.register(registerData);
-
-      setCurrentUser(user);
-      setIsAuthenticated(true);
-      setShowRegister(false);
-
-      // Mostrar notificación de registro exitoso
-      toast.success(`¡Bienvenido, ${user.nombre}!`, {
-        description: "Tu cuenta ha sido creada exitosamente",
-        duration: 4000,
-      });
-
-      return true;
-    } catch (error) {
-      console.error("Error durante el registro:", error);
-      toast.error("Error en el registro", {
-        description: error instanceof Error ? error.message : "No se pudo crear la cuenta",
-        duration: 4000,
-      });
-      return false;
-    } finally {
-      setIsRegistering(false);
-    }
-  };
-
-  // Función para manejar la recuperación de contraseña por email
-  const handlePasswordRecovery = async (recoveryData: PasswordRecoveryData): Promise<boolean> => {
-    setIsRecoveringPassword(true);
-
-    try {
-      // Enviar solicitud de recuperación al backend real
-      const success = await apiService.sendPasswordRecovery(recoveryData);
-
-      if (!success) {
-        toast.error("Email no encontrado", {
-          description: "No se encontró una cuenta asociada a este email",
+      // Obtener clave secreta desde variable de entorno o usar fallback
+      const validSecretKey = import.meta.env.VITE_ADMIN_SECRET_KEY || "Duki9796";
+      
+      // Simular latencia de validación para mayor realismo
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      if (secretKey === validSecretKey) {
+        console.log('✅ Clave secreta válida - acceso administrativo autorizado');
+        setShowAdminSecretAccess(false);
+        setShowAdminPanel(true);
+        
+        toast.success("Acceso autorizado", {
+          description: "Bienvenido al panel de administración",
+          duration: 3000,
+        });
+        
+        // Limpiar la URL para mayor seguridad
+        window.history.replaceState({}, '', '/');
+        
+        return true;
+      } else {
+        console.warn('❌ Intento de acceso administrativo con clave incorrecta');
+        
+        toast.error("Acceso denegado", {
+          description: "Clave secreta incorrecta",
           duration: 4000,
         });
+        
+        return false;
       }
-
-      return success;
     } catch (error) {
-      console.error("Error durante la recuperación:", error);
-      toast.error("Error en la recuperación", {
-        description: error instanceof Error ? error.message : "No se pudo enviar el email de recuperación",
+      console.error("Error validando clave secreta:", error);
+      
+      toast.error("Error de validación", {
+        description: "No se pudo validar la clave secreta",
         duration: 4000,
       });
+      
       return false;
     } finally {
-      setIsRecoveringPassword(false);
+      setIsValidatingSecret(false);
     }
   };
+
+  // Función para cerrar el acceso secreto y volver al login
+  const handleCloseSecretAccess = () => {
+    setShowAdminSecretAccess(false);
+    
+    // Limpiar la URL
+    window.history.replaceState({}, '', '/');
+    
+    toast.info("Acceso cancelado", {
+      description: "Regresando al login principal",
+      duration: 2000,
+    });
+  };
+
+  // Función para cerrar el panel de administración
+  const handleCloseAdminPanel = () => {
+    setShowAdminPanel(false);
+    
+    toast.info("Panel cerrado", {
+      description: "Regresando al login principal",
+      duration: 2000,
+    });
+  };
+
+
 
   // Función para logout
   const handleLogout = async () => {
     try {
       // Cerrar sesión en el backend
       await apiService.logout();
-
+      
       toast.info("Sesión cerrada", {
         description: "Has cerrado sesión correctamente",
         duration: 2000,
       });
-
+      
       setCurrentUser(null);
       setIsAuthenticated(false);
       setSelectedDate(undefined);
@@ -200,12 +280,12 @@ export default function App() {
     const today = new Date();
     const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
+    
     // El día debe ser el día actual Y no estar finalizado
     const isToday = dateOnly.getTime() === todayOnly.getTime();
     const dateKey = dateOnly.toISOString().split('T')[0];
     const isFinalized = diasFinalizados.has(dateKey);
-
+    
     return isToday && !isFinalized;
   };
 
@@ -213,12 +293,12 @@ export default function App() {
   const handleDateSelect = async (date: Date | undefined) => {
     if (date) {
       setIsLoadingDay(true);
-
+      
       try {
         // Cargar todos los datos del día seleccionado desde el backend
         const fechaStr = date.toISOString().split('T')[0];
         const datosDia = await apiService.obtenerDatosDia(fechaStr);
-
+        
         // Los datos se cargarán automáticamente cuando el DayDetailsPanel se monte
         // con la fecha seleccionada
         setSelectedDate(date);
@@ -239,17 +319,28 @@ export default function App() {
   // Función para finalizar un día
   const handleFinalizarDia = async (): Promise<void> => {
     if (!selectedDate || !currentUser) return;
+    
     setIsLoadingDay(true);
-
+    
     try {
       // Finalizar día en el backend
       const fechaStr = selectedDate.toISOString().split('T')[0];
       const success = await apiService.finalizarDia(fechaStr);
-
+      
       if (success) {
+        // 🔧 AGREGADO: Logs de debugging
+        console.log('✅ Día finalizado exitosamente en backend:', fechaStr);
+        
         // Agregar el día a la lista de días finalizados
-        setDiasFinalizados((prev: Set<string>) => new Set([...prev, fechaStr]));
-
+        setDiasFinalizados((prev: Set<string>) => {
+          const nuevoSet = new Set([...prev, fechaStr]);
+          console.log('🗂️ Nuevo set de días finalizados:', nuevoSet);
+          return nuevoSet;
+        });
+        
+        // Forzar re-renderizado del calendario
+        setCalendarKey(prev => prev + 1);
+        
         toast.success("Día finalizado", {
           description: "El día ha sido finalizado correctamente",
           duration: 3000,
@@ -286,30 +377,26 @@ export default function App() {
     );
   }
 
-  // Mostrar formulario de login, registro o recuperación si no está autenticado
+  // Mostrar formulario de login, recuperación, acceso secreto o panel de admin si no está autenticado
   if (!isAuthenticated) {
-    if (showPasswordRecovery) {
+    if (showAdminPanel) {
       return (
-        <PasswordRecoveryForm
-          onRecovery={handlePasswordRecovery}
-          onBackToLogin={() => setShowPasswordRecovery(false)}
-          isLoading={isRecoveringPassword}
+        <AdminUserManagement 
+          onClose={handleCloseAdminPanel}
         />
       );
-    } else if (showRegister) {
+    } else if (showAdminSecretAccess) {
       return (
-        <RegisterForm
-          onRegister={handleRegister}
-          onBackToLogin={() => setShowRegister(false)}
-          isLoading={isRegistering}
+        <AdminSecretAccess 
+          onAccess={handleValidateSecretKey}
+          onBackToLogin={handleCloseSecretAccess}
+          isLoading={isValidatingSecret}
         />
       );
     } else {
       return (
-        <LoginForm
+        <LoginForm 
           onLogin={handleLogin}
-          onShowRegister={() => setShowRegister(true)}
-          onShowPasswordRecovery={() => setShowPasswordRecovery(true)}
           isLoading={isLoggingIn}
         />
       );
@@ -326,7 +413,7 @@ export default function App() {
             <p className="font-medium text-sm">Bienvenido, {currentUser?.nombre}</p>
             <p className="text-xs text-muted-foreground">{currentUser?.email}</p>
           </div>
-
+          
           <button
             onClick={handleLogout}
             className="px-3 py-2 text-xs bg-muted hover:bg-muted/80 rounded-md transition-colors flex items-center gap-2"
@@ -345,40 +432,41 @@ export default function App() {
             Selecciona un día del calendario para gestionar tus gastos diarios y quinielas
           </p>
         </div>
-
+        
         <div className="flex justify-center relative min-h-[600px]">
           {!selectedDate && !isLoadingDay ? (
-            <CalendarView
-              selectedDate={selectedDate}
+            <CalendarView 
+              key={calendarKey} // 🔧 AGREGADO: Key para forzar re-renderizado
+              selectedDate={selectedDate} 
               onDateSelect={handleDateSelect}
               diasFinalizados={diasFinalizados}
             />
           ) : selectedDate && !isLoadingDay ? (
             <div className="w-full max-w-4xl">
-              <DayDetailsPanel
-                selectedDate={selectedDate}
+              <DayDetailsPanel 
+                selectedDate={selectedDate} 
                 isEditable={isDayEditable(selectedDate)}
                 onVolver={() => handleDateSelect(undefined)}
                 onFinalizarDia={handleFinalizarDia}
               />
             </div>
           ) : null}
-
+          
           {/* Loading Overlay para selección de día */}
           {isLoadingDay && (
             <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[60]">
               <div className="flex flex-col items-center gap-3 p-6 bg-card rounded-lg shadow-xl border-2">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 <p className="text-sm text-muted-foreground">
-                  {selectedDate && diasFinalizados.has(selectedDate.toISOString().split('T')[0])
-                    ? "Finalizando día..."
+                  {selectedDate && diasFinalizados.has(selectedDate.toISOString().split('T')[0]) 
+                    ? "Finalizando día..." 
                     : "Cargando información del día..."}
                 </p>
               </div>
             </div>
           )}
         </div>
-
+        
         {!selectedDate && !isLoadingDay && (
           <div className="text-center mt-8 p-8 border-2 border-dashed border-muted rounded-lg">
             <p className="text-muted-foreground">

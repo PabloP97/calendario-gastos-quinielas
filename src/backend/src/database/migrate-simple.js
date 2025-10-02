@@ -58,17 +58,17 @@ const migrations = [
     query: `
       CREATE TABLE IF NOT EXISTS usuarios (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        nombre VARCHAR(100) NOT NULL,
+        numero_quiniela VARCHAR(10) UNIQUE NOT NULL,
+        nombre_quiniela VARCHAR(50) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
-        numero_quiniela VARCHAR(20) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
-        pregunta_seguridad TEXT NOT NULL,
-        respuesta_seguridad_hash VARCHAR(255) NOT NULL,
-        ultimo_acceso TIMESTAMP NULL,
-        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ultimo_acceso DATETIME NULL,
+        fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
         activo BOOLEAN DEFAULT TRUE,
+        email_verificado BOOLEAN DEFAULT FALSE,
         
         INDEX idx_email (email),
+        INDEX idx_email_activo (email, activo),
         INDEX idx_numero_quiniela (numero_quiniela),
         INDEX idx_activo (activo)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -77,18 +77,20 @@ const migrations = [
   {
     name: 'create_sesiones_table',
     query: `
-      CREATE TABLE IF NOT EXISTS sesiones (
+      CREATE TABLE IF NOT EXISTS sesiones_usuario (
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
-        session_token TEXT NOT NULL,
-        remember_token TEXT NULL,
+        session_token VARCHAR(255) UNIQUE NOT NULL,
+        remember_token VARCHAR(255) NULL,
         ip_address VARCHAR(45) NULL,
         user_agent TEXT NULL,
-        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        fecha_expiracion TIMESTAMP NOT NULL,
+        fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+        fecha_expiracion DATETIME NOT NULL,
         activo BOOLEAN DEFAULT TRUE,
         
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+        INDEX idx_session_token (session_token),
+        INDEX idx_usuario_activo (usuario_id, activo),
         INDEX idx_usuario_id (usuario_id),
         INDEX idx_activo (activo),
         INDEX idx_fecha_expiracion (fecha_expiracion)
@@ -104,14 +106,16 @@ const migrations = [
         monto DECIMAL(10,2) NOT NULL,
         categoria VARCHAR(50) NOT NULL,
         subcategoria VARCHAR(50) NULL,
-        descripcion TEXT NOT NULL,
+        descripcion TEXT NULL,
         fecha DATE NOT NULL,
-        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+        activo BOOLEAN DEFAULT TRUE,
         
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
         INDEX idx_usuario_fecha (usuario_id, fecha),
         INDEX idx_categoria (categoria),
-        INDEX idx_fecha (fecha)
+        INDEX idx_fecha (fecha),
+        INDEX idx_activo (activo)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `
   },
@@ -127,13 +131,15 @@ const migrations = [
         descripcion TEXT NULL,
         fecha DATE NOT NULL,
         fuente VARCHAR(50) NOT NULL,
-        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+        activo BOOLEAN DEFAULT TRUE,
         
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
         INDEX idx_usuario_fecha (usuario_id, fecha),
         INDEX idx_tipo (tipo),
         INDEX idx_categoria (categoria),
-        INDEX idx_fecha (fecha)
+        INDEX idx_fecha (fecha),
+        INDEX idx_activo (activo)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `
   },
@@ -170,6 +176,49 @@ const migrations = [
         INDEX idx_fecha (fecha)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `
+  },
+  {
+    name: 'create_configuracion_horarios_table',
+    query: `
+      CREATE TABLE IF NOT EXISTS configuracion_horarios (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        usuario_id INT NOT NULL,
+        modalidad_id INT NOT NULL,
+        nombre_modalidad VARCHAR(100) NOT NULL,
+        horario_inicio TIME NOT NULL,
+        horario_fin TIME NOT NULL,
+        activo BOOLEAN DEFAULT TRUE,
+        fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_usuario_modalidad (usuario_id, modalidad_id),
+        INDEX idx_usuario_id (usuario_id),
+        INDEX idx_modalidad_id (modalidad_id),
+        INDEX idx_activo (activo)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `
+  },
+  {
+    name: 'create_password_reset_tokens_table',
+    query: `
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        usuario_id INT NOT NULL,
+        reset_token VARCHAR(255) UNIQUE NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        fecha_expiracion TIMESTAMP NOT NULL,
+        usado BOOLEAN DEFAULT FALSE,
+        ip_address VARCHAR(45) NULL,
+        user_agent TEXT NULL,
+        
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+        INDEX idx_reset_token (reset_token),
+        INDEX idx_email_token (email, reset_token),
+        INDEX idx_expiracion (fecha_expiracion, usado),
+        INDEX idx_usuario_id (usuario_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `
   }
 ];
 
@@ -202,20 +251,16 @@ async function createDemoUser() {
     
     // Crear usuario demo
     const passwordHash = await bcrypt.hash('demo123', 12);
-    const respuestaHash = await bcrypt.hash('azul', 12);
     
     await executeQuery(`
       INSERT INTO usuarios (
-        nombre, email, numero_quiniela, password_hash, 
-        pregunta_seguridad, respuesta_seguridad_hash, activo
-      ) VALUES (?, ?, ?, ?, ?, ?, 1)
+        numero_quiniela, nombre_quiniela, email, password_hash, activo
+      ) VALUES (?, ?, ?, ?, 1)
     `, [
+      '12345',
       'Usuario Demo',
       'admin@demo.com',
-      '12345',
-      passwordHash,
-      '¿Cuál es tu color favorito?',
-      respuestaHash
+      passwordHash
     ]);
     
     console.log('👤 Usuario demo creado exitosamente');

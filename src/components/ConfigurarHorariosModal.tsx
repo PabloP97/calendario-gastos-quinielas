@@ -4,7 +4,9 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Clock, Save, RotateCcw } from "lucide-react";
+import { Clock, Save, RotateCcw, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import apiService from "../services/apiService";
 
 interface QuinielaModalidad {
   id: number;
@@ -31,6 +33,7 @@ export function ConfigurarHorariosModal({
 }: ConfigurarHorariosModalProps) {
   const [horariosEditados, setHorariosEditados] = useState<QuinielaModalidad[]>([]);
   const [errores, setErrores] = useState<Record<number, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   // Inicializar con los horarios actuales cuando se abre el modal
   useEffect(() => {
@@ -129,7 +132,7 @@ export function ConfigurarHorariosModal({
     setErrores(nuevosErrores);
   };
 
-  const handleGuardar = () => {
+  const handleGuardar = async () => {
     const nuevosErrores = validarHorarios(horariosEditados);
     
     if (Object.keys(nuevosErrores).length > 0) {
@@ -137,11 +140,38 @@ export function ConfigurarHorariosModal({
       return;
     }
 
-    // TODO: SP_UPDATE - Guardar configuración de horarios en base de datos
-    // EXEC SP_UpdateHorariosQuiniela @horarios_json = ?, @usuario_id = ?
+    setIsLoading(true);
     
-    onGuardarHorarios(horariosEditados);
-    onClose();
+    try {
+      // Convertir al formato esperado por el backend
+      const horariosParaBackend = horariosEditados.map(modalidad => ({
+        modalidad_id: modalidad.id,
+        nombre_modalidad: modalidad.name,
+        horario_inicio: modalidad.horarioInicio + ':00', // Agregar segundos
+        horario_fin: modalidad.horarioFin + ':00'
+      }));
+
+      // Guardar en el backend
+      await apiService.actualizarHorariosQuiniela(horariosParaBackend);
+      
+      // Notificar al componente padre
+      onGuardarHorarios(horariosEditados);
+      
+      toast.success("Horarios actualizados", {
+        description: "Los horarios de quiniela han sido guardados correctamente",
+        duration: 3000,
+      });
+      
+      onClose();
+    } catch (error) {
+      console.error("Error guardando horarios:", error);
+      toast.error("Error al guardar", {
+        description: "No se pudieron guardar los horarios. Inténtalo de nuevo.",
+        duration: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRestaurarDefecto = () => {
@@ -253,11 +283,20 @@ export function ConfigurarHorariosModal({
             </Button>
             <Button 
               onClick={handleGuardar}
-              disabled={Object.keys(errores).length > 0}
+              disabled={Object.keys(errores).length > 0 || isLoading}
               className="flex items-center gap-2"
             >
-              <Save className="h-4 w-4" />
-              Guardar Cambios
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  Guardar Cambios
+                </>
+              )}
             </Button>
           </div>
         </DialogFooter>

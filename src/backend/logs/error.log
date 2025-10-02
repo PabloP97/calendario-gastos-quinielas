@@ -5,3 +5,339 @@
   environment: 'development',
   timestamp: '2025-09-23 09:59:46'
 }
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  errno: -4047,
+  code: 'EPIPE',
+  syscall: 'write',
+  level: 'error',
+  message: 'Uncaught Exception: write EPIPE',
+  stack: 'Error: write EPIPE\n' +
+    '    at afterWriteDispatched (node:internal/stream_base_commons:159:15)\n' +
+    '    at writeGeneric (node:internal/stream_base_commons:150:3)\n' +
+    '    at Socket._writeGeneric (node:net:971:11)\n' +
+    '    at Socket._write (node:net:983:8)\n' +
+    '    at writeOrBuffer (node:internal/streams/writable:572:12)\n' +
+    '    at _write (node:internal/streams/writable:501:10)\n' +
+    '    at Writable.write (node:internal/streams/writable:510:10)\n' +
+    '    at Console.log (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\winston\\lib\\winston\\transports\\console.js:87:23)\n' +
+    '    at Console._write (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\winston-transport\\modern.js:103:17)\n' +
+    '    at doWrite (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\readable-stream\\lib\\_stream_writable.js:390:139)',
+  timestamp: '2025-10-01 09:15:39'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  message: "Error en middleware de autenticación: Unknown column 'nombre_quiniela' in 'field list'",
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  sql: '\n' +
+    '      SELECT id, nombre_quiniela, email, numero_quiniela, activo \n' +
+    '      FROM usuarios \n' +
+    '      WHERE id = ? AND activo = 1\n' +
+    '    ',
+  sqlState: '42S22',
+  sqlMessage: "Unknown column 'nombre_quiniela' in 'field list'",
+  level: 'error',
+  stack: "Error: Unknown column 'nombre_quiniela' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at authenticateToken (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/auth.ts:21:29)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)',
+  timestamp: '2025-10-02 11:39:38'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column 'username' in 'field list'",
+  stack: "Error: Unknown column 'username' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/auth.ts:18:25\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 'No autenticado',
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 11:39:46'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 11:40:39'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 11:42:32'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 12:19:09'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 12:30:31'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 12:31:17'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 13:00:24'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 13:02:54'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 13:05:31'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 13:07:31'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 13:09:52'
+}
+{
+  service: 'calendario-backend',
+  environment: 'production',
+  error: "Unknown column '%Y-%m-%d' in 'field list'",
+  stack: "Error: Unknown column '%Y-%m-%d' in 'field list'\n" +
+    '    at PromisePool.execute (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\mysql2\\lib\\promise\\pool.js:54:22)\n' +
+    '    at executeQuery (file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/config/database.ts:25:35)\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/routes/saldos.ts:16:35\n' +
+    '    at file:///C:/Users/Pinetta%20Hernan/Desktop/React/Quiniela/calendario-gastos-quinielas/src/backend/src/middleware/errorHandler.ts:71:25\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at Function.process_params (C:\\Users\\Pinetta Hernan\\Desktop\\React\\Quiniela\\calendario-gastos-quinielas\\src\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)',
+  url: '/api/v1/saldos/dias-finalizados',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  userId: 1,
+  level: 'error',
+  message: 'Error capturado:',
+  timestamp: '2025-10-02 13:15:47'
+}

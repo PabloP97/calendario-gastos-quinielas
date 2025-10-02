@@ -8,8 +8,8 @@ import { ConfigurarHorariosModal } from "./ConfigurarHorariosModal";
 import { useConfirmation } from "./ui/use-confirmation";
 import { useState, useEffect } from "react";
 import { QuinielaModalidad, TransaccionQuiniela } from "../types";
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   ChevronRight,
   Sunrise,
   Sun,
@@ -21,54 +21,55 @@ import {
   TrendingUp,
   TrendingDown,
   Edit,
-  Trash2
+  Trash2,
+  AlertCircle
 } from "lucide-react";
 
 const modalidadesQuiniela: QuinielaModalidad[] = [
-  { 
-    id: 1, 
-    name: "La Primera", 
-    icon: Sunrise, 
-    description: "Primer sorteo del día",
-    horario: "11:30 AM",
-    horarioInicio: "09:00",
-    horarioFin: "11:30"
+  {
+    id: 1,
+    name: "La Primera",
+    icon: Sunrise,
+    description: "Cierre: 9:15 AM",
+    horario: "9:15 AM",
+    horarioInicio: "08:00",
+    horarioFin: "09:15"
   },
-  { 
-    id: 2, 
-    name: "Matutina", 
-    icon: Sun, 
-    description: "Sorteo matutino",
-    horario: "14:00 PM",
-    horarioInicio: "12:00",
-    horarioFin: "14:00"
+  {
+    id: 2,
+    name: "Matutina",
+    icon: Sun,
+    description: "Cierre: 11:45 AM",
+    horario: "11:45 AM",
+    horarioInicio: "08:00",
+    horarioFin: "11:45"
   },
-  { 
-    id: 3, 
-    name: "Vespertina", 
-    icon: Sunset, 
-    description: "Sorteo vespertino",
-    horario: "17:30 PM",
-    horarioInicio: "15:30",
-    horarioFin: "17:30"
+  {
+    id: 3,
+    name: "Vespertina",
+    icon: Sunset,
+    description: "Cierre: 1:15 PM",
+    horario: "1:15 PM",
+    horarioInicio: "08:00",
+    horarioFin: "13:15"
   },
-  { 
-    id: 4, 
-    name: "De la Tarde", 
-    icon: SunMedium, 
-    description: "Sorteo de la tarde",
-    horario: "20:00 PM",
-    horarioInicio: "18:00",
-    horarioFin: "20:00"
+  {
+    id: 4,
+    name: "De la Tarde",
+    icon: SunMedium,
+    description: "Cierre: 6:45 PM",
+    horario: "6:45 PM",
+    horarioInicio: "08:00",
+    horarioFin: "18:45"
   },
-  { 
-    id: 5, 
-    name: "Nocturna", 
-    icon: Moon, 
-    description: "Sorteo nocturno",
-    horario: "21:30 PM",
-    horarioInicio: "20:30",
-    horarioFin: "21:30"
+  {
+    id: 5,
+    name: "Nocturna",
+    icon: Moon,
+    description: "Cierre: 8:45 PM",
+    horario: "8:45 PM",
+    horarioInicio: "08:00",
+    horarioFin: "20:45"
   },
 ];
 
@@ -79,14 +80,58 @@ interface QuinielaNacionalDetailProps {
   onEditarTransaccion: (transaccion: TransaccionQuiniela) => Promise<void>;
   transacciones: TransaccionQuiniela[];
   isEditable: boolean;
+  modalidades?: any[]; // Modalidades con estado desde el backend
 }
 
-export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onEliminarTransaccion, onEditarTransaccion, transacciones, isEditable }: QuinielaNacionalDetailProps) {
+export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onEliminarTransaccion, onEditarTransaccion, transacciones, isEditable, modalidades }: QuinielaNacionalDetailProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showCierreModal, setShowCierreModal] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showHorariosModal, setShowHorariosModal] = useState(false);
   const [modalidadesActuales, setModalidadesActuales] = useState<QuinielaModalidad[]>(modalidadesQuiniela);
+
+  // Actualizar modalidades cuando se reciban desde el padre
+  useEffect(() => {
+    console.log('🔍 QuinielaNacionalDetail - Modalidades recibidas:', modalidades);
+
+    if (modalidades && modalidades.length > 0) {
+      try {
+        // Combinar modalidades del backend con iconos y datos locales
+        const modalidadesActualizadas = modalidades.map((modalidadBackend: any) => {
+          const modalidadLocal = modalidadesQuiniela.find(m => m.id === modalidadBackend.modalidad_id) || modalidadesQuiniela[0];
+          return {
+            ...modalidadLocal,
+            id: modalidadBackend.modalidad_id,
+            name: modalidadBackend.nombre_modalidad,
+            description: `${modalidadBackend.horario_inicio?.slice(0, 5)} - ${modalidadBackend.horario_fin?.slice(0, 5)}`,
+            horario: formatearHorarioDisplay(modalidadBackend.horario_fin?.slice(0, 5) || modalidadLocal.horarioFin),
+            horarioInicio: modalidadBackend.horario_inicio?.slice(0, 5) || modalidadLocal.horarioInicio,
+            horarioFin: modalidadBackend.horario_fin?.slice(0, 5) || modalidadLocal.horarioFin,
+            esta_abierta: modalidadBackend.esta_abierta,
+            minutos_restantes: modalidadBackend.minutos_restantes
+          };
+        });
+        console.log('✅ Modalidades procesadas:', modalidadesActualizadas);
+        setModalidadesActuales(modalidadesActualizadas);
+      } catch (error) {
+        console.error('❌ Error procesando modalidades:', error);
+        // Mantener modalidades por defecto si hay error
+        setModalidadesActuales(modalidadesQuiniela);
+      }
+    } else {
+      console.log('⚠️ No hay modalidades del backend, usando por defecto');
+      // Si no hay modalidades del backend, usar las por defecto
+      setModalidadesActuales(modalidadesQuiniela);
+    }
+  }, [modalidades]);
+
+  // Helper para formatear horario de 24h a formato display (HH:MM AM/PM)
+  const formatearHorarioDisplay = (horario24: string): string => {
+    const [horas, minutos] = horario24.split(':').map(Number);
+    const periodo = horas >= 12 ? 'PM' : 'AM';
+    const horas12 = horas === 0 ? 12 : horas > 12 ? horas - 12 : horas;
+    return `${horas12}:${minutos.toString().padStart(2, '0')} ${periodo}`;
+  };
   const [transaccionAEditar, setTransaccionAEditar] = useState<TransaccionQuiniela | null>(null);
   const { isOpen, currentAction, showConfirmation, hideConfirmation } = useConfirmation();
 
@@ -109,74 +154,82 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
     return () => clearInterval(timer);
   }, []);
 
-  // Función para verificar si una modalidad está disponible
-  const isModalidadDisponible = (modalidad: QuinielaModalidad): boolean => {
+  // Función para verificar si una modalidad está disponible (abierta)
+  const isModalidadDisponible = (modalidad: any): boolean => {
+    // Si tenemos información del backend, usar esa SIEMPRE
+    if (modalidad.esta_abierta !== undefined) {
+      console.log(`🔍 Modalidad ${modalidad.name} - Estado backend: ${modalidad.esta_abierta}`);
+      return modalidad.esta_abierta;
+    }
+
+    // Fallback: lógica local SOLO si no hay datos del backend
     const now = currentTime;
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
-    
-    // Convertir horarios a formato 24h para comparación
-    const [inicioHour, inicioMinute] = modalidad.horarioInicio.split(':').map(Number);
+
+    // Convertir horario de cierre a formato 24h para comparación
     const [finHour, finMinute] = modalidad.horarioFin.split(':').map(Number);
-    
-    const inicioMinutos = inicioHour * 60 + inicioMinute;
     const finMinutos = finHour * 60 + finMinute;
     const currentMinutos = currentHour * 60 + currentMinute;
-    
-    return currentMinutos >= inicioMinutos && currentMinutos <= finMinutos;
+
+    // ✅ LÓGICA CORREGIDA: La modalidad está disponible todo el día hasta su hora de cierre
+    const disponibleLocal = currentMinutos < finMinutos;
+    console.log(`🔍 Modalidad ${modalidad.name} - Estado local: ${disponibleLocal} (${currentHour}:${currentMinute.toString().padStart(2, '0')} vs cierre ${finHour}:${finMinute.toString().padStart(2, '0')})`);
+    return disponibleLocal;
   };
 
-  // Obtener próxima modalidad disponible
-  const getProximaModalidad = (): QuinielaModalidad | null => {
-    const now = currentTime;
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const currentMinutos = currentHour * 60 + currentMinute;
-    
-    for (const modalidad of modalidadesActuales) {
-      const [inicioHour, inicioMinute] = modalidad.horarioInicio.split(':').map(Number);
-      const inicioMinutos = inicioHour * 60 + inicioMinute;
-      
-      if (currentMinutos < inicioMinutos) {
-        return modalidad;
-      }
+  // Obtener próxima modalidad que se va a cerrar
+  const getProximaModalidadACerrar = (): any | null => {
+    const modalidadesAbiertas = modalidadesActuales.filter(isModalidadDisponible);
+
+    if (modalidadesAbiertas.length === 0) {
+      return null; // Todas cerradas
     }
-    
-    // Si ya pasaron todas las modalidades del día, la próxima es La Primera del día siguiente
-    return modalidadesActuales[0];
+
+    // Encontrar la que se cierre más pronto
+    return modalidadesAbiertas.reduce((proxima, actual) => {
+      const [horaProxima, minutoProxima] = proxima.horarioFin.split(':').map(Number);
+      const [horaActual, minutoActual] = actual.horarioFin.split(':').map(Number);
+
+      const minutosProxima = horaProxima * 60 + minutoProxima;
+      const minutosActual = horaActual * 60 + minutoActual;
+
+      return minutosActual < minutosProxima ? actual : proxima;
+    });
   };
 
-  const proximaModalidad = getProximaModalidad();
+  const proximaModalidadACerrar = getProximaModalidadACerrar();
+  const modalidadesAbiertas = modalidadesActuales.filter(isModalidadDisponible);
 
   // Contar modalidades disponibles
-  const modalidadesDisponibles = modalidadesActuales.filter(modalidad => 
+  const modalidadesDisponibles = modalidadesActuales.filter(modalidad =>
     isModalidadDisponible(modalidad)
   ).length;
 
   const getEstadoGeneral = () => {
-    const modalidadesActivas = modalidadesActuales.filter(modalidad => 
+    const modalidadesActivas = modalidadesActuales.filter(modalidad =>
       isModalidadDisponible(modalidad)
     );
-    
+
     if (modalidadesDisponibles === 0) {
-      return { 
-        texto: "Todas Cerradas", 
-        variant: "destructive" as const, 
-        className: "bg-red-100 text-red-800 border-red-200 font-medium" 
+      return {
+        texto: "Todas Cerradas",
+        variant: "destructive" as const,
+        className: "bg-red-100 text-red-800 border-red-200 font-medium"
       };
     } else if (modalidadesDisponibles === modalidadesActuales.length) {
-      return { 
-        texto: "Todas Activas", 
-        variant: "default" as const, 
-        className: "bg-green-100 text-green-800 border-green-200 font-medium" 
+      return {
+        texto: "Todas Activas",
+        variant: "default" as const,
+        className: "bg-green-100 text-green-800 border-green-200 font-medium"
       };
     } else {
       // Mostrar cuál modalidad específica está activa
       const nombresActivas = modalidadesActivas.map(m => m.name).join(" y ");
-      return { 
-        texto: `${nombresActivas} Activa${modalidadesActivas.length > 1 ? 's' : ''}`, 
-        variant: "outline" as const, 
-        className: "bg-orange-100 text-orange-800 border-orange-200 font-medium" 
+      return {
+        texto: `${nombresActivas} Activa${modalidadesActivas.length > 1 ? 's' : ''}`,
+        variant: "outline" as const,
+        className: "bg-orange-100 text-orange-800 border-orange-200 font-medium"
       };
     }
   };
@@ -206,7 +259,7 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
     // Cerrar el modal de edición primero
     setIsEditModalOpen(false);
     setTransaccionAEditar(null);
-    
+
     // Mostrar el modal de confirmación para guardar
     showConfirmation({
       type: 'edit',
@@ -248,9 +301,9 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
   const transaccionesHoy = transacciones.filter(t => t.fuente === 'Quiniela');
 
   // Obtener fecha actual en formato string
-  const fechaActual = new Date().toLocaleTimeString('es-ES', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  const fechaActual = new Date().toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit'
   });
 
 
@@ -305,19 +358,35 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
             {currentTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
+
+        {/* Estado de carga de modalidades */}
+        {(!modalidades || modalidades.length === 0) && modalidadesActuales.length === modalidadesQuiniela.length && (
+          <Card className="bg-amber-50 border-amber-200">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-600" />
+                <div>
+                  <h4 className="text-amber-800">Funcionando sin servidor</h4>
+                  <p className="text-amber-600 text-sm">Usando horarios predeterminados. Para obtener horarios actualizados y estados en tiempo real, asegúrate de que el backend esté funcionando.</p>
+                  <p className="text-amber-500 text-xs mt-1">💡 Ejecuta <code>npm run start:backend</code> en otra terminal</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {modalidadesActuales.map((modalidad) => {
           const disponible = isModalidadDisponible(modalidad);
           return (
-            <Card 
-              key={modalidad.id} 
+            <Card
+              key={modalidad.id}
               className="transition-colors"
             >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${
-                      disponible ? 'bg-primary/10' : 'bg-muted/50'
-                    }`}>
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${disponible ? 'bg-primary/10' : 'bg-muted/50'
+                      }`}>
                       {disponible ? (
                         <modalidad.icon className="h-6 w-6 text-primary" />
                       ) : (
@@ -332,16 +401,16 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
                       <div className="flex items-center gap-2 mt-1">
                         <Clock className="h-3 w-3 text-muted-foreground" />
                         <span className="text-muted-foreground">
-                          {disponible 
-                            ? `Disponible hasta ${modalidad.horario}`
-                            : `Disponible ${modalidad.horarioInicio} - ${modalidad.horario}`
+                          {disponible
+                            ? `Se cierra a las ${modalidad.horario}`
+                            : `Cerrado desde ${modalidad.horario}`
                           }
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge 
+                    <Badge
                       variant={disponible ? "default" : "outline"}
                       className={disponible ? "bg-green-500 text-white" : "text-muted-foreground"}
                     >
@@ -364,18 +433,18 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Button 
-            variant="default" 
-            className="w-full justify-start bg-green-600 hover:bg-green-700 text-white" 
+          <Button
+            variant="default"
+            className="w-full justify-start bg-green-600 hover:bg-green-700 text-white"
             disabled={!isEditable}
             onClick={handleCierreDia}
           >
             <Clock className="h-4 w-4 mr-2" />
             Cerrar Día de Quiniela
           </Button>
-          <Button 
-            variant="outline" 
-            className="w-full justify-start" 
+          <Button
+            variant="outline"
+            className="w-full justify-start"
             disabled={!isEditable}
             onClick={handleConfigurarHorarios}
           >
@@ -393,13 +462,13 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
         <CardContent className="p-4">
           <div className="text-center">
             <h4 className="mb-2">Próximo Sorteo</h4>
-            {proximaModalidad && (
+            {proximaModalidadACerrar && (
               <div className="flex items-center justify-center gap-2">
-                <proximaModalidad.icon className="h-4 w-4 text-orange-500" />
+                <proximaModalidadACerrar.icon className="h-4 w-4 text-orange-500" />
                 <p className="text-muted-foreground">
-                  {proximaModalidad.name} - {proximaModalidad.horario}
-                  {proximaModalidad === modalidadesActuales[0] && 
-                   currentTime.getHours() >= 21 && " (mañana)"}
+                  {proximaModalidadACerrar.name} - {proximaModalidadACerrar.horario}
+                  {proximaModalidadACerrar === modalidadesActuales[0] &&
+                    currentTime.getHours() >= 21 && " (mañana)"}
                 </p>
               </div>
             )}
@@ -418,11 +487,10 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
               {transaccionesHoy.map((transaccion, index) => (
                 <div key={transaccion.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                      transaccion.tipo === 'ingreso' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                    }`}>
-                      {transaccion.tipo === 'ingreso' ? 
-                        <TrendingUp className="h-4 w-4" /> : 
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${transaccion.tipo === 'ingreso' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                      }`}>
+                      {transaccion.tipo === 'ingreso' ?
+                        <TrendingUp className="h-4 w-4" /> :
                         <TrendingDown className="h-4 w-4" />
                       }
                     </div>
@@ -433,8 +501,8 @@ export function QuinielaNacionalDetail({ onVolver, onAgregarTransaccion, onElimi
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={transaccion.tipo === 'ingreso' ? 'text-green-600' : 'text-destructive'}
                     >
                       {transaccion.tipo === 'ingreso' ? '+' : '-'}${toNumber(transaccion.monto).toFixed(2)}

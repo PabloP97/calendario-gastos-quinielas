@@ -13,9 +13,9 @@ const getApiBaseUrl = (): string => {
   if (process.env.NODE_ENV === 'development') {
     return 'http://localhost:4000/api/v1';
   }
-
+  
   // En producción, usar la URL del backend desplegado
-  return 'https://calendario-gastos-quinielas.onrender.com/api/v1';
+  return process.env.VITE_API_BASE_URL || window.location.origin + '/api/v1';
 };
 
 // ============================================
@@ -29,35 +29,34 @@ export const config = {
     timeout: 10000, // 10 segundos
     retries: 3,
   },
-
+  
   // Configuración de autenticación
   auth: {
     tokenKey: 'auth_token',
     refreshTokenKey: 'refresh_token',
-    sessionKey: 'remembered_session',
     tokenExpiration: 24 * 60 * 60 * 1000, // 24 horas en millisegundos
   },
-
+  
   // Configuración de la aplicación
   app: {
     name: 'Calendario de Gastos y Quinielas',
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development',
   },
-
+  
   // Configuración de notificaciones
   notifications: {
     defaultDuration: 3000,
     errorDuration: 4000,
     successDuration: 2000,
   },
-
+  
   // Configuración de loading
   loading: {
     minDuration: 1000, // Duración mínima del loading (1 segundo)
     transactionDuration: 1000, // Loading para transacciones
   },
-
+  
   // Configuración de localStorage
   storage: {
     prefix: 'calendario_gastos_',
@@ -67,14 +66,14 @@ export const config = {
       cache: 'api_cache',
     },
   },
-
+  
   // Configuración de fechas
   dates: {
     format: 'DD/MM/YYYY',
     apiFormat: 'YYYY-MM-DD',
     locale: 'es-ES',
   },
-
+  
   // Configuración de categorías de gastos
   gastos: {
     categorias: {
@@ -89,7 +88,7 @@ export const config = {
       ALQUILER: 'Alquiler',
     },
   },
-
+  
   // Configuración de quinielas
   quinielas: {
     tipos: {
@@ -133,11 +132,11 @@ export const getConfig = (path: string, fallback: any): any => {
   try {
     const keys = path.split('.');
     let value: any = config;
-
+    
     for (const key of keys) {
       value = value?.[key];
     }
-
+    
     return value !== undefined ? value : fallback;
   } catch {
     return fallback;
@@ -182,7 +181,6 @@ export const clearAuthToken = (): void => {
   try {
     localStorage.removeItem(config.auth.tokenKey);
     localStorage.removeItem(config.auth.refreshTokenKey);
-    localStorage.removeItem(config.auth.sessionKey);
   } catch (error) {
     console.error('Error limpiando tokens:', error);
   }
@@ -195,11 +193,11 @@ export const formatDate = (date: Date | string, format?: string): string => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     const targetFormat = format || config.dates.format;
-
+    
     if (targetFormat === 'YYYY-MM-DD') {
       return dateObj.toISOString().split('T')[0];
     }
-
+    
     // Formato DD/MM/YYYY por defecto
     return dateObj.toLocaleDateString(config.dates.locale);
   } catch {

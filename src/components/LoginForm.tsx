@@ -5,58 +5,54 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Alert, AlertDescription } from "./ui/alert";
-import {
-  Eye,
-  EyeOff,
-  Loader2,
-  Lock,
-  User,
+import { 
+  Eye, 
+  EyeOff, 
+  Loader2, 
+  Lock, 
+  User, 
   AlertCircle,
   Calendar,
-  DollarSign
+  DollarSign,
+  UserPlus
 } from "lucide-react";
 import { LoginCredentials } from "../types";
 
 interface LoginFormProps {
   onLogin: (credentials: LoginCredentials) => Promise<boolean>;
-  onShowRegister: () => void;
-  onShowPasswordRecovery: () => void;
   isLoading: boolean;
 }
 
 interface FormErrors {
-  email?: string;
+  username?: string;
   password?: string;
   general?: string;
 }
 
-export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isLoading }: LoginFormProps) {
+export function LoginForm({ onLogin, isLoading }: LoginFormProps) {
   const [credentials, setCredentials] = useState<LoginCredentials>({
-    email: "",
-    password: "",
-    rememberMe: false
+    username: "",
+    password: ""
   });
-
+  
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
-  // Validación de email
-  const validateEmail = (email: string): string | undefined => {
-    if (!email.trim()) {
-      return "El email es requerido";
+  // Validación de nombre de usuario (simplificada)
+  const validateUsername = (username: string): string | undefined => {
+    if (!username.trim()) {
+      return "El nombre de usuario es requerido";
     }
-
-    // Validación más estricta de email
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    if (!emailRegex.test(email)) {
-      return "Ingresa un email válido (ejemplo: usuario@dominio.com)";
+    
+    if (username.length < 3) {
+      return "El nombre de usuario debe tener al menos 3 caracteres";
     }
-
-    if (email.length > 100) {
-      return "El email no puede tener más de 100 caracteres";
+    
+    if (username.length > 100) {
+      return "El nombre de usuario no puede tener más de 100 caracteres";
     }
-
+    
     return undefined;
   };
 
@@ -65,28 +61,28 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
     if (!password) {
       return "La contraseña es requerida";
     }
-
-    if (password.length < 3) {
-      return "La contraseña debe tener al menos 3 caracteres";
+    
+    if (password.length < 6) {
+      return "La contraseña debe tener al menos 6 caracteres";
     }
-
+    
     if (password.length > 255) {
       return "La contraseña no puede tener más de 255 caracteres";
     }
-
+    
     return undefined;
   };
 
   // Validar formulario completo
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};
-
-    const emailError = validateEmail(credentials.email);
-    if (emailError) newErrors.email = emailError;
-
+    
+    const usernameError = validateUsername(credentials.username);
+    if (usernameError) newErrors.username = usernameError;
+    
     const passwordError = validatePassword(credentials.password);
     if (passwordError) newErrors.password = passwordError;
-
+    
     return newErrors;
   };
 
@@ -108,17 +104,17 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
   };
 
   // Manejar blur para validación en tiempo real
-  const handleBlur = (field: 'email' | 'password') => {
+  const handleBlur = (field: 'username' | 'password') => {
     if (!hasAttemptedSubmit) return;
-
+    
     let fieldError: string | undefined;
-
-    if (field === 'email') {
-      fieldError = validateEmail(credentials.email);
+    
+    if (field === 'username') {
+      fieldError = validateUsername(credentials.username);
     } else if (field === 'password') {
       fieldError = validatePassword(credentials.password);
     }
-
+    
     setErrors(prev => ({
       ...prev,
       [field]: fieldError
@@ -129,24 +125,24 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setHasAttemptedSubmit(true);
-
+    
     const formErrors = validateForm();
     setErrors(formErrors);
-
+    
     if (Object.keys(formErrors).length > 0) {
       return;
     }
 
     try {
       // TODO: SP_SELECT - Validar credenciales de usuario
-      // EXEC SP_ValidateUserCredentials @email = ?, @password_hash = ?
-      // EXEC SP_GetUserByEmail @email = ?
-
+      // EXEC SP_ValidateUserCredentials @username = ?, @password_hash = ?
+      // EXEC SP_GetUserByUsername @username = ?
+      
       const loginSuccess = await onLogin(credentials);
-
+      
       if (!loginSuccess) {
         setErrors({
-          general: "Email o contraseña incorrectos. Por favor, verifica tus credenciales."
+          general: "Usuario o contraseña incorrectos. Por favor, verifica tus credenciales."
         });
       }
     } catch (error) {
@@ -170,7 +166,7 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
               <DollarSign className="h-8 w-8 text-chart-1" />
             </div>
           </div>
-
+          
           <div>
             <h1 className="text-3xl font-bold text-foreground">
               Gestión de Gastos
@@ -179,10 +175,11 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
               y Quinielas
             </h2>
           </div>
-
+          
           <p className="text-muted-foreground">
-            Inicia sesión para acceder a tu calendario financiero
+            Ingresa tus credenciales para acceder
           </p>
+
         </div>
 
         {/* Formulario de login */}
@@ -193,7 +190,7 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
               Iniciar Sesión
             </CardTitle>
           </CardHeader>
-
+          
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {/* Error general */}
@@ -204,27 +201,27 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
                 </Alert>
               )}
 
-              {/* Campo Email */}
+              {/* Campo Nombre de Usuario */}
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Usuario</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="tu@email.com"
-                    value={credentials.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    onBlur={() => handleBlur('email')}
-                    className={`pl-10 ${errors.email ? 'border-destructive focus:border-destructive' : ''}`}
+                    id="username"
+                    type="text"
+                    placeholder="usuario"
+                    value={credentials.username}
+                    onChange={(e) => handleInputChange("username", e.target.value)}
+                    onBlur={() => handleBlur('username')}
+                    className={`pl-10 ${errors.username ? 'border-destructive focus:border-destructive' : ''}`}
                     disabled={isLoading}
-                    autoComplete="email"
+                    autoComplete="username"
                   />
                 </div>
-                {errors.email && (
+                {errors.username && (
                   <p className="text-sm text-destructive flex items-center gap-1">
                     <AlertCircle className="h-3 w-3" />
-                    {errors.email}
+                    {errors.username}
                   </p>
                 )}
               </div>
@@ -263,26 +260,13 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
               </div>
 
               {/* Recordar sesión */}
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={credentials.rememberMe}
-                  onCheckedChange={(checked) => handleInputChange("rememberMe", checked as boolean)}
-                  disabled={isLoading}
-                />
-                <Label
-                  htmlFor="remember"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Recordar mi sesión
-                </Label>
-              </div>
+
             </CardContent>
 
             <CardFooter className="flex flex-col space-y-4 pt-2">
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full mt-6"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -296,15 +280,8 @@ export function LoginForm({ onLogin, onShowRegister, onShowPasswordRecovery, isL
               </Button>
 
               {/* Links adicionales */}
-              <div className="text-center space-y-2">
-                <button
-                  type="button"
-                  onClick={onShowPasswordRecovery}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors underline cursor-pointer"
-                  disabled={isLoading}
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
+              <div className="text-center space-y-3">
+
               </div>
             </CardFooter>
           </form>

@@ -3,9 +3,9 @@ import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
 import { useConfirmation } from "./ui/use-confirmation";
 import { ConfirmationModal } from "./ConfirmationModal";
-import {
-  TrendingUp,
-  TrendingDown,
+import { 
+  TrendingUp, 
+  TrendingDown, 
   DollarSign,
   Calculator,
   Receipt,
@@ -14,8 +14,6 @@ import {
   Minus,
   Plus
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import apiService from "@/services/apiService";
 
 interface Gasto {
   id: number;
@@ -46,19 +44,7 @@ interface ResumenFinancieroProps {
 
 export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior, isEditable, onFinalizarDia }: ResumenFinancieroProps) {
   const { isOpen, currentAction, showConfirmation, hideConfirmation } = useConfirmation();
-  const [isFinalizado, setIsFinalizado] = useState(false)
-  useEffect(() => {
-    fetchDiasFinalizados()
-  }, [isFinalizado])
-  const fetchDiasFinalizados = async () => {
-    const fechaHoy = new Date().getDate()
-    const data = await apiService.obtenerDiasFinalizados()
-    const ultimoDiaFinalizado = new Date(data[0]).getDate() + 1
-    if (fechaHoy === ultimoDiaFinalizado) {
-      setIsFinalizado(true)
-    }
-  }
-
+  
   // Función para convertir a número seguro
   const toNumber = (value: any): number => {
     const num = Number(value);
@@ -72,20 +58,20 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
       servicios: 'Servicios',
       otros: 'Otros'
     };
-
+    
     const nombreCategoria = categorias[gasto.categoria as keyof typeof categorias] || gasto.categoria;
-
+    
     if (gasto.subcategoria) {
       const subcategorias = {
         luz: 'Luz',
-        agua: 'Agua',
+        agua: 'Agua', 
         internet: 'Internet',
         alquiler: 'Alquiler'
       };
       const nombreSubcategoria = subcategorias[gasto.subcategoria as keyof typeof subcategorias] || gasto.subcategoria;
       return `${nombreCategoria} - ${nombreSubcategoria}`;
     }
-
+    
     return nombreCategoria;
   };
 
@@ -232,7 +218,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                   const juegoTransaccion = t.fuente === 'caja-interna' ? 'Caja Interna' : t.fuente;
                   return juegoTransaccion === juego;
                 });
-
+                
                 return (
                   <div key={juego} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
@@ -252,7 +238,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                   </div>
                 );
               })}
-
+              
               <Separator />
               <div className="flex items-center justify-between p-2">
                 <span>Total Ingresos</span>
@@ -287,7 +273,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                   const juegoTransaccion = t.fuente === 'caja-interna' ? 'Caja Interna' : t.fuente;
                   return juegoTransaccion === juego;
                 });
-
+                
                 // Agrupar transacciones por categoría para este juego
                 const transaccionesPorCategoria = transaccionesJuego.reduce((acc, t) => {
                   acc[t.categoria] = (acc[t.categoria] || 0) + toNumber(t.monto);
@@ -313,7 +299,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                         -${toNumber(monto).toFixed(2)}
                       </Badge>
                     </div>
-
+                    
                     {/* Desglose por categorías */}
                     <div className="p-2 space-y-1">
                       {Object.entries(transaccionesPorCategoria).map(([categoria, montoCategoria]) => (
@@ -326,7 +312,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                   </div>
                 );
               })}
-
+              
               <Separator />
               <div className="flex items-center justify-between p-2">
                 <span>Total Egresos</span>
@@ -352,7 +338,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
               <Calculator className="h-6 w-6" />
               <h3>Saldo Final del Día</h3>
             </div>
-
+            
             {/* Cálculo Visual */}
             <div className="bg-white/50 rounded-lg p-4 mb-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -378,7 +364,7 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
                 </div>
               </div>
             </div>
-
+            
             <div className={`text-4xl mb-2 ${saldoFinal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               ${Math.abs(saldoFinal).toFixed(2)}
             </div>
@@ -386,47 +372,43 @@ export function ResumenFinanciero({ gastos, transaccionesQuiniela, saldoAnterior
               {saldoFinal >= 0 ? '🎉 Saldo Final Positivo' : '⚠️ Saldo Final Negativo'}
             </p>
             <p className="text-muted-foreground text-sm">
-              {saldoFinal >= 0
+              {saldoFinal >= 0 
                 ? 'Este saldo se arrastrará al día siguiente'
                 : 'Deuda que se arrastrará al día siguiente'}
             </p>
-
+            
             {/* Botón Finalizar Día */}
             {isEditable && onFinalizarDia && (
               <div className="mt-6 pt-4 border-t border-border">
                 <p className="text-sm text-muted-foreground mb-3">
                   ⚠️ Una vez finalizado, no podrás realizar más cambios en este día
                 </p>
-                {
-                  !isFinalizado && (
-                    <button
-                      onClick={() => showConfirmation({
-                        title: "¿Finalizar este día?",
-                        description: "Una vez finalizado, no podrás realizar más cambios en este día. Esta acción no se puede deshacer.",
-                        onConfirm: () => {
-                          onFinalizarDia?.();
-                          hideConfirmation();
-                        },
-                        onCancel: hideConfirmation,
-                        confirmText: "Sí, Finalizar Día",
-                        cancelText: "Cancelar",
-                        variant: "destructive"
-                      })}
-                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Finalizar Día
-                    </button>
-                  )
-                }
+                <button
+                  onClick={() => showConfirmation({
+                    title: "¿Finalizar este día?",
+                    description: "Una vez finalizado, no podrás realizar más cambios en este día. Esta acción no se puede deshacer.",
+                    onConfirm: () => {
+                      onFinalizarDia?.();
+                      hideConfirmation();
+                    },
+                    onCancel: hideConfirmation,
+                    confirmText: "Sí, Finalizar Día",
+                    cancelText: "Cancelar",
+                    variant: "destructive"
+                  })}
+                  className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Finalizar Día
+                </button>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
-
+      
       {/* Modal de Confirmación */}
       <ConfirmationModal
         isOpen={isOpen}

@@ -2,48 +2,20 @@ import Joi from 'joi';
 
 // Esquemas de validación para autenticación
 export const loginSchema = Joi.object({
-  email: Joi.string().email().required().messages({
-    'string.email': 'El email debe tener un formato válido',
-    'any.required': 'El email es requerido'
+  username: Joi.string().min(3).max(100).required().messages({
+    'string.min': 'El nombre de usuario debe tener al menos 3 caracteres',
+    'string.max': 'El nombre de usuario no puede tener más de 100 caracteres',
+    'any.required': 'El nombre de usuario es requerido'
   }),
   password: Joi.string().min(6).required().messages({
     'string.min': 'La contraseña debe tener al menos 6 caracteres',
     'any.required': 'La contraseña es requerida'
   }),
-  rememberMe: Joi.boolean().default(false)
+
 });
 
-export const registerSchema = Joi.object({
-  numeroQuiniela: Joi.string().min(3).max(20).required().messages({
-    'string.min': 'El número de quiniela debe tener al menos 3 caracteres',
-    'string.max': 'El número de quiniela no puede tener más de 20 caracteres',
-    'any.required': 'El número de quiniela es requerido'
-  }),
-  nombreQuiniela: Joi.string().min(2).max(100).required().messages({
-    'string.min': 'El nombre debe tener al menos 2 caracteres',
-    'string.max': 'El nombre no puede tener más de 100 caracteres',
-    'any.required': 'El nombre es requerido'
-  }),
-  password: Joi.string().min(6).max(128).required().messages({
-    'string.min': 'La contraseña debe tener al menos 6 caracteres',
-    'string.max': 'La contraseña no puede tener más de 128 caracteres',
-    'any.required': 'La contraseña es requerida'
-  }),
-  confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
-    'any.only': 'Las contraseñas no coinciden',
-    'any.required': 'La confirmación de contraseña es requerida'
-  }),
-  preguntaSeguridad: Joi.string().min(10).max(255).required().messages({
-    'string.min': 'La pregunta de seguridad debe tener al menos 10 caracteres',
-    'string.max': 'La pregunta de seguridad no puede tener más de 255 caracteres',
-    'any.required': 'La pregunta de seguridad es requerida'
-  }),
-  respuestaSeguridad: Joi.string().min(2).max(255).required().messages({
-    'string.min': 'La respuesta debe tener al menos 2 caracteres',
-    'string.max': 'La respuesta no puede tener más de 255 caracteres',
-    'any.required': 'La respuesta de seguridad es requerida'
-  })
-});
+// 🗑️ ELIMINADO: registerSchema - Ya no se permite registro público
+// Los usuarios solo pueden ser creados por administradores desde el panel admin
 
 export const passwordRecoverySchema = Joi.object({
   email: Joi.string().email().required().messages({
@@ -99,8 +71,8 @@ export const createTransaccionQuinielaSchema = Joi.object({
     'string.max': 'El juego no puede tener más de 50 caracteres',
     'any.required': 'El juego es requerido'
   }),
-  monto: Joi.number().positive().precision(2).required().messages({
-    'number.positive': 'El monto debe ser mayor a 0',
+  monto: Joi.number().precision(2).required().messages({
+    'number.base': 'El monto debe ser un número válido',
     'any.required': 'El monto es requerido'
   }),
   tipo: Joi.string().valid('ingreso', 'egreso').required().messages({
@@ -116,7 +88,7 @@ export const updateTransaccionQuinielaSchema = Joi.object({
   id: Joi.number().integer().positive().required(),
   fecha: Joi.string().pattern(/^\d{4}-\d{2}-\d{2}$/).required(),
   juego: Joi.string().min(1).max(50).required(),
-  monto: Joi.number().positive().precision(2).required(),
+  monto: Joi.number().precision(2).required(),
   tipo: Joi.string().valid('ingreso', 'egreso').required(),
   descripcion: Joi.string().max(255).optional().allow('')
 });

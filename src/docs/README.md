@@ -27,7 +27,7 @@
 - 🎯 **Múltiples juegos**: Quiniela Nacional, Quini 6, Brinco, Loto, Poceada, Telekino, Loto Plus, Quiniela Express
 - 🎭 **Modal de cierre unificado**: Todos los juegos usan el mismo sistema de entrada de datos
 - 📊 **Categorías específicas**: Diferentes tipos de ingresos/egresos según el juego
-- 📝 **Solo informativo**: Modalidades de Quiniela Nacional son informativas
+- ⏰ **Horarios configurables**: Cada modalidad tiene horarios personalizables
 
 ### 📅 **Sistema de Calendario Inteligente**
 - 🗓️ **Navegación intuitiva** entre meses y años
@@ -84,28 +84,11 @@ npm run dev
 
 | Documento | Descripción |
 |-----------|-------------|
-| 📖 [**Índice Completo**](docs/index.md) | Centro de documentación con guías de navegación |
-| 📋 [**Instalación**](docs/installation.md) | Guía completa de instalación paso a paso |
-| 🏗️ [**Base de Datos**](docs/database-schema.md) | Esquema completo y stored procedures |
-| 🤝 [**Contribución**](docs/contributing.md) | Guía para contribuir al proyecto |
-| 🎨 [**Desarrollo**](docs/development-guidelines.md) | Estándares y convenciones de código |
-
-## 🗄️ **Base de Datos**
-
-### **Setup Rápido**
-```bash
-cd backend
-node reset-database.js  # Crea BD y usuario demo
-```
-
-**Tablas Principales:**
-- `usuarios` - Gestión de usuarios con username
-- `gastos` - Transacciones de caja interna  
-- `transacciones_quiniela` - Movimientos de quinielas
-- `configuracion_horarios` - Horarios personalizables
-- `dias_finalizados` - Control de días cerrados
-
-📄 **Ver esquema completo:** [docs/database-schema.md](docs/database-schema.md)
+| 📋 [**Instalación**](installation.md) | Guía completa de instalación paso a paso |
+| 🏗️ [**Base de Datos**](database-schema.md) | Esquema completo y stored procedures |
+| 🤝 [**Contribución**](contributing.md) | Guía para contribuir al proyecto |
+| 🎨 [**Desarrollo**](development-guidelines.md) | Estándares y convenciones de código |
+| 📄 [**Licencia**](../LICENSE.md) | Términos de uso MIT |
 
 ## 🛠️ **Tecnologías Utilizadas**
 
@@ -153,10 +136,10 @@ node reset-database.js  # Crea BD y usuario demo
 │   ├── 📄 CalendarView.tsx    # 📅 Vista del calendario
 │   ├── 📄 DayDetailsPanel.tsx # 📊 Panel de detalles
 │   └── 📄 QuinielaMenu.tsx    # 🎲 Menú quinielas
+├── 📁 docs/                   # 📖 Documentación
 ├── 📁 services/               # 🔌 Servicios de API
 ├── 📁 types/                  # 📘 Tipos TypeScript
 ├── 📄 App.tsx                 # 🏠 Componente principal
-├── 📄 README.md               # 📖 Esta documentación
 └── 📄 package.json            # 📦 Dependencias
 ```
 
@@ -280,8 +263,6 @@ npm run build
 - 🌐 **Cloud**: PlanetScale, Railway, AWS RDS
 - 🏠 **Self-hosted**: MySQL 8.0+
 
-📄 **Documentación completa:** [docs/index.md](docs/index.md)
-
 ## 🤝 **Contribución**
 
 1. 🍴 **Fork** del proyecto
@@ -291,14 +272,14 @@ npm run build
 5. 🔀 Abrir **Pull Request**
 
 ### **Guías de Desarrollo**
-- 📝 Seguir [**Guías de Desarrollo**](docs/development-guidelines.md)
+- 📝 Seguir [**Guías de Desarrollo**](development-guidelines.md)
 - 🎨 Usar **Prettier** para formato
 - ✅ Agregar **tests** para nuevas funciones
 - 📖 Documentar cambios importantes
 
 ## 📄 **Licencia**
 
-Este proyecto está bajo la **Licencia MIT** - ver [LICENSE.md](LICENSE.md) para detalles.
+Este proyecto está bajo la **Licencia MIT** - ver [LICENSE.md](../LICENSE.md) para detalles.
 
 ## 🙏 **Agradecimientos**
 

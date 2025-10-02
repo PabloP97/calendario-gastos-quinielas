@@ -35,7 +35,7 @@ export const authenticateToken = async (
 
     // Verificar que el usuario existe y está activo
     const userQuery = `
-      SELECT id, nombre, email, numero_quiniela, activo 
+      SELECT id, nombre_quiniela, email, numero_quiniela, activo 
       FROM usuarios 
       WHERE id = ? AND activo = 1
     `;
@@ -53,7 +53,7 @@ export const authenticateToken = async (
     // Verificar que existe una sesión activa para este token
     const sessionQuery = `
       SELECT id, fecha_expiracion 
-      FROM sesiones 
+      FROM sesiones_usuario 
       WHERE usuario_id = ? AND session_token = ? AND activo = 1
     `;
     
@@ -73,7 +73,7 @@ export const authenticateToken = async (
     if (new Date() > new Date(session.fecha_expiracion)) {
       // Marcar sesión como inactiva
       await executeQuery(
-        'UPDATE sesiones SET activo = 0 WHERE id = ?',
+        'UPDATE sesiones_usuario SET activo = 0 WHERE id = ?',
         [session.id]
       );
       

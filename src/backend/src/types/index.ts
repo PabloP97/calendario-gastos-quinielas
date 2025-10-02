@@ -1,6 +1,7 @@
 // Interfaces compartidas entre frontend y backend
 export interface User {
   id: number;
+  username: string;
   nombre: string;
   email: string;
   numeroQuiniela?: string;
@@ -9,9 +10,8 @@ export interface User {
 }
 
 export interface LoginCredentials {
-  email: string;
+  username: string; // Cambiado de email a username (puede ser email o número de quiniela)
   password: string;
-  rememberMe: boolean;
 }
 
 export interface RegisterData {
@@ -65,12 +65,11 @@ export interface DatosDia {
 // Interfaces específicas del backend
 export interface DbUser {
   id: number;
-  nombre: string;
+  username: string; // Nombre de usuario para login
+  nombre_quiniela: string; // Nombre de la quiniela (el nombre principal del usuario)
   email: string;
   numero_quiniela: string;
   password_hash: string;
-  pregunta_seguridad: string;
-  respuesta_seguridad_hash: string;
   ultimo_acceso: Date;
   fecha_creacion: Date;
   activo: boolean;
@@ -80,7 +79,6 @@ export interface Session {
   id: number;
   usuario_id: number;
   session_token: string;
-  remember_token?: string;
   ip_address?: string;
   user_agent?: string;
   fecha_creacion: Date;
@@ -97,6 +95,7 @@ export interface ApiResponse<T = any> {
 
 export interface JwtPayload {
   userId: number;
+  username: string;
   email: string;
   nombre: string;
   iat?: number;
